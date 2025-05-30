@@ -85,3 +85,32 @@ API -->> User: Return Success/Failure
 # 📝 Review Creation - Sequence Description
 
 User fills and submits a review form including comment and rating. The API captures the request and sends it to the ReviewService. ReviewService validates the input and builds a Review object. The Database stores the new review. A confirmation goes back up through the service and API. The User receives a success or error message.
+
+# 🧩 Sequence Diagram – Fetching a List of Places
+
+This sequence diagram shows how the HBnB system handles a request to fetch a filtered list of available places.
+It outlines how the request travels through the API, is processed by the business logic, and retrieves data from the database.
+
+---
+
+```mermaid
+sequenceDiagram
+title Fetching Places Flow
+
+participant User
+participant API
+participant PlaceService
+participant Database
+
+User ->> API: Request list of places (with filters)
+API ->> PlaceService: Apply filters and fetch places
+PlaceService ->> Database: Query matching places
+Database -->> PlaceService: Return place list
+PlaceService -->> API: Return data
+API -->> User: Send list of places
+
+```
+
+# 📝 Fetching a List of Places - Sequence Description
+
+User sends a request to retrieve places, possibly with filters (e.g., location, price, amenities). The API layer receives and forwards the request to the PlaceService. PlaceService applies the filters and queries the Database. The Database returns the list of places that match the criteria. The list is passed back through the Service and API layers. The User receives the final filtered list of places.
