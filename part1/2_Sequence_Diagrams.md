@@ -11,7 +11,7 @@ sequenceDiagram
     API->>UserService: validate(email, password, name)
     UserService->>Database: Save new User to DB
     Database-->>UserService: Comfirm Save
-    BusinessLogic-->>API: Return Response
+    UserService-->>API: Return Response
 	API-->>User: Return Success/Failure
 
 ```
