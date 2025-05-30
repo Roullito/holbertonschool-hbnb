@@ -53,6 +53,8 @@ User --> Review : writes
 Place --> Review : receives
 Place --> Amenity : has >*
 
+```
+
 ## Business Logic Layer – Entities Description
 
 ### 👤 User
