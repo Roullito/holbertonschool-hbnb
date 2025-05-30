@@ -2,17 +2,17 @@
 
 ```mermaid
 sequenceDiagram
-participant User
-participant API
-participant BusinessLogic
-participant Database
+    participant User
+    participant API
+    participant UserService
+    participant Database
 
-User->>API: API Call (e.g., Register User)
-API->>BusinessLogic: Validate and Process Request
-BusinessLogic->>Database: Save Data
-Database-->>BusinessLogic: Confirm Save
-BusinessLogic-->>API: Return Response
-API-->>User: Return Success/Failure
+    User->>API: POST /users (email, password, name)
+    API->>UserService: validate(email, password, name)
+    UserService->>Database: Save new User to DB
+    Database-->>UserService: Comfirm Save
+    BusinessLogic-->>API: Return Response
+	API-->>User: Return Success/Failure
 
 ```
 
