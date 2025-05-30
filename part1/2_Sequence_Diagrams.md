@@ -1,5 +1,10 @@
 # 🧩 Sequence Diagram - User Registration
 
+This sequence diagram shows how a new user is register in the HBnB application.
+It demonstrates the flow of data through the API, service, and database layers.
+
+---
+
 ```mermaid
 sequenceDiagram
     participant User
