@@ -57,3 +57,31 @@ API -->> User: Return Success/Failure
 
 User sends place information like title, location, and price. The API forwards the request to the PlaceService. PlaceService checks the data and builds a new Place object. The Database saves the new place entry. A confirmation is sent back up through the layers. The User receives a message indicating if the place creation succeeded or failed.
 
+# 🧩 Sequence Diagram – Review Submission
+
+This sequence diagram explains how a user submits a review for a place in the HBnB platform.
+It highlights the interaction between the user, API, service logic, and data storage.
+
+---
+
+```mermaid
+sequenceDiagram
+title Review Submission Flow
+
+participant User
+participant API
+participant ReviewService
+participant Database
+
+User ->> API: Submit review (e.g., rating, comment, place_id)
+API ->> ReviewService: Validate and create Review
+ReviewService ->> Database: Save review to DB
+Database -->> ReviewService: Confirm Save
+ReviewService -->> API: Return Response
+API -->> User: Return Success/Failure
+
+```
+
+# 📝 Review Creation - Sequence Description
+
+User fills and submits a review form including comment and rating. The API captures the request and sends it to the ReviewService. ReviewService validates the input and builds a Review object. The Database stores the new review. A confirmation goes back up through the service and API. The User receives a success or error message.
