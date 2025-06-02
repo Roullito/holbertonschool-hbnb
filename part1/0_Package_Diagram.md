@@ -16,6 +16,8 @@ class BusinessLogicLayer {
 class PersistenceLayer {
     +DataBaseAccess
 }
+PresentationLayer --> BusinessLogicLayer : Facade Pattern
+BusinessLogicLayer --> PersistenceLayer : Database Operations
 ```
 
 ---
