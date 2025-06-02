@@ -2,31 +2,20 @@
 
 ```mermaid
 classDiagram
-
 class PresentationLayer {
     <<Interface>>
+    +API
     +UserService
-    +PlaceService
-    +ReviewService
-    +AmenityService
 }
-
 class BusinessLogicLayer {
     +User
     +Place
     +Review
     +Amenity
 }
-
 class PersistenceLayer {
-    +UserRepository
-    +PlaceRepository
-    +ReviewRepository
-    +AmenityRepository
+    +DataBaseAccess
 }
-
-PresentationLayer --> BusinessLogicLayer : uses (via Facade Services)
-BusinessLogicLayer --> PersistenceLayer : accesses (via Repositories)
 ```
 
 ---
