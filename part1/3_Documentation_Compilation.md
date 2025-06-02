@@ -130,17 +130,18 @@ Place --> "*" Amenity : has
 
 ```mermaid
 sequenceDiagram
-participant User
-participant API
-participant UserService
-participant UserRepository
+    participant User
+    participant API
+    participant UserService
+    participant Database
 
-User ->> API: Submit registration data
-API ->> UserService: Validate input and create User
-UserService ->> UserRepository: Save new User to DB
-UserRepository -->> UserService: Return save confirmation
-UserService -->> API: Send success message
-API -->> User: Respond with success or error
+    User->>API: POST /users (email, password, name)
+    API->>UserService: validate(email, password, name)
+    UserService->>Database: Save new User to DB
+    Database-->>UserService: Comfirm Save
+    UserService-->>API: Return Response
+	API-->>User: Return Success/Failure
+
 ```
 
 **Description**: User sends registration data → API → Service → Repository → Confirmation response.
@@ -151,6 +152,8 @@ API -->> User: Respond with success or error
 
 ```mermaid
 sequenceDiagram
+title Place Creation Flow
+
 participant User
 participant API
 participant PlaceService
@@ -162,6 +165,7 @@ PlaceService ->> Database: Save new place to DB
 Database -->> PlaceService: Confirm Save
 PlaceService -->> API: Return Response
 API -->> User: Return Success/Failure
+
 ```
 
 **Description**: User submits place info → API → PlaceService → DB → response
@@ -172,6 +176,8 @@ API -->> User: Return Success/Failure
 
 ```mermaid
 sequenceDiagram
+title Review Submission Flow
+
 participant User
 participant API
 participant ReviewService
@@ -183,6 +189,7 @@ ReviewService ->> Database: Save review to DB
 Database -->> ReviewService: Confirm Save
 ReviewService -->> API: Return Response
 API -->> User: Return Success/Failure
+
 ```
 
 **Description**: Review submission goes through API and is saved after validation.
@@ -193,6 +200,8 @@ API -->> User: Return Success/Failure
 
 ```mermaid
 sequenceDiagram
+title Fetching Places Flow
+
 participant User
 participant API
 participant PlaceService
@@ -204,6 +213,7 @@ PlaceService ->> Database: Query matching places
 Database -->> PlaceService: Return place list
 PlaceService -->> API: Return data
 API -->> User: Send list of places
+
 ```
 
 **Description**: User asks for places → filters applied → DB queried → results returned
