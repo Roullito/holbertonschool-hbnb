@@ -1,4 +1,4 @@
-from hbnb.app.persistence.repository import InMemoryRepository
+from app.persistence.repository import InMemoryRepository
 
 class HBnBFacade:
     def __init__(self):
