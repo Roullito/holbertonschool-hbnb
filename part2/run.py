@@ -1,4 +1,4 @@
-from app import create_app
+from hbnb.app import create_app
 
 app = create_app()
 
