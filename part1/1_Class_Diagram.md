@@ -22,6 +22,7 @@ class Place {
   +float price
   +float latitude
   +float longitude
+  +str owner
   +datetime created_at
   +datetime updated_at
   +create()
@@ -32,6 +33,8 @@ class Review {
   +UUID id
   +int rating
   +str comment
+  +str place
+  +str user
   +datetime created_at
   +datetime updated_at
   +submit()
