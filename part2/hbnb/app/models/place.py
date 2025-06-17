@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 
-from base_model import BaseModel
+from hbnb.app.models.base_model import BaseModel
 from models.user import User
+from hbnb.app.models.review import Review
+from hbnb.app.models.amenity import Amenity
+
 
 class Place(BaseModel):
     def __init__(self, title, description, price:float, latitude:float, longitude:float, owner):
@@ -47,8 +50,13 @@ class Place(BaseModel):
 
     def add_review(self, review):
         """Add a review to the place."""
+        if not isinstance(review, Review):
+            raise TypeError("Review must be an instance of the Review class.")
         self.reviews.append(review)
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
-        self.amenities.append(amenity)
+        if not isinstance(amenity, Amenity):
+            raise TypeError("Amenity must be an instance of the Amenity class.")
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
