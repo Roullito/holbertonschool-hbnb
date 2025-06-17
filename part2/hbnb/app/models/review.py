@@ -8,6 +8,8 @@ class Review(BaseModel):
         super().__init__()
         if not isinstance(comment, str):
             raise TypeError("Review comment must be a string.")
+        elif not comment.strip():
+            raise ValueError("Review comment must be a non-empty string.")
         self.comment = comment
 
         if not isinstance(rating, int):
