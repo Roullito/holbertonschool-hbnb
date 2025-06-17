@@ -1,16 +1,17 @@
-from hbnb.app.models.base_model import BaseModel
-from hbnb.app.models.place import Place
-from hbnb.app.models.user import User
+#!/usr/bin/python3
+from base_model import BaseModel
+from place import Place
+from user import User
 
 
 class Review(BaseModel):
-    def __init__(self, comment, rating, place, user):
+    def __init__(self, text, rating, place, user):
         super().__init__()
-        if not isinstance(comment, str):
+        if not isinstance(text, str):
             raise TypeError("Review comment must be a string.")
-        elif not comment.strip():
+        elif not text.strip():
             raise ValueError("Review comment must be a non-empty string.")
-        self.comment = comment
+        self.text = text
 
         if not isinstance(rating, int):
             raise TypeError("Your rating must be an integer")
