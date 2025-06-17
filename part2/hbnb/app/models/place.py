@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
 from hbnb.app.models.base_model import BaseModel
-from models.user import User
+from hbnb.app.models.user import User
 from hbnb.app.models.review import Review
 from hbnb.app.models.amenity import Amenity
-
 
 class Place(BaseModel):
     def __init__(self, title, description, price:float, latitude:float, longitude:float, owner):

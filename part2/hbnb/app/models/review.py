@@ -12,7 +12,9 @@ class Review(BaseModel):
             raise ValueError("Review comment must be a non-empty string.")
         self.comment = comment
 
-        if not isinstance(rating, int) or rating < 1 or rating > 5:
+        if not isinstance(rating, int):
+            raise TypeError("Your rating must be an integer")
+        if rating < 1 or rating > 5:
             raise ValueError("Rating must be an integer between 1 and 5.")
         self.rating = rating
 
