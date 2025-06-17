@@ -1,5 +1,5 @@
 from hbnb.app.persistence.repository import InMemoryRepository
-
+from hbnb.app.models.user import User
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
