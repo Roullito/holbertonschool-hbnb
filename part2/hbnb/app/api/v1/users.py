@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from app.services import HBnBFacade
+from hbnb.app.services import HBnBFacade
 
 # Create an instance of the business logic facade
 facade = HBnBFacade()
