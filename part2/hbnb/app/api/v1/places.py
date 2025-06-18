@@ -2,7 +2,7 @@
 
 from hbnb.app.models.base_model import BaseModel
 from flask_restx import Namespace, Resource, fields
-from app.services import facade
+from hbnb.app.services import facade
 
 api = Namespace('places', description='Place operations')
 
@@ -82,4 +82,3 @@ class PlaceResource(Resource):
         if not place:
             return {"error": "Place not found"}, 404
         return place.to_dict(), 200
-
