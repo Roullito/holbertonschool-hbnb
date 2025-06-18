@@ -1,5 +1,7 @@
 from hbnb.app.persistence.repository import InMemoryRepository
 from hbnb.app.models.user import User
+from hbnb.app.models.amenity import Amenity
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
@@ -30,3 +32,23 @@ class HBnBFacade:
             if hasattr(user, key):
                 setattr(user, key, value)
         return user
+
+    def create_amenity(self, amenity_data):
+        amenity = Amenity(**amenity_data)
+        self.amenity_repo.add(amenity)
+        return amenity
+
+    def get_amenity(self, amenity_id):
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        amenity = self.amenity_repo.get(amenity_id)
+        if not amenity:
+            return None
+        for key, value in amenity_data.items():
+            if hasattr(amenity, key):
+                setattr(amenity, key, value)
+        return amenity
