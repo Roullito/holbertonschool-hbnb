@@ -1,6 +1,8 @@
 from hbnb.app.persistence.repository import InMemoryRepository
 from hbnb.app.models.user import User
 from hbnb.app.models.amenity import Amenity
+from hbnb.app.models.place import Place
+from hbnb.app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
@@ -52,3 +54,68 @@ class HBnBFacade:
             if hasattr(amenity, key):
                 setattr(amenity, key, value)
         return amenity
+
+    def create_place(self, place_data):
+            place = Place(**place_data)
+            self.place_repo.add(place)
+            return place
+
+    def get_place(self, place_id):
+        return self.place_repo.get(place_id)
+
+    def get_all_places(self):
+        return self.place_repo.get_all()
+
+    def update_place(self, place_id, place_data):
+        place = self.place_repo.get(place_id)
+        if not place:
+            return None
+        for key, value in place_data.items():
+            if hasattr(place, key):
+                setattr(place, key, value)
+        return place
+
+    def create_review(self, review_data):
+        # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
+        review = Review(**review_data)
+        self.review_repo.add(review)
+        return review
+
+    def get_review(self, review_id):
+        # Placeholder for logic to retrieve a review by ID
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        # Placeholder for logic to retrieve all reviews
+        return self.review_repo.get_all()
+
+    def get_reviews_by_place(self, place_id):
+        # Placeholder for logic to retrieve all reviews for a specific place
+        all_review = self.review_repo.get_all()
+        filtered_reviews = []
+        for review in all_review:
+            if review.place.id == place_id:
+                filtered_reviews.append(review)
+        return filtered_reviews
+
+
+    def update_review(self, review_id, review_data):
+        # Placeholder for logic to update a review
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+        for key, value in review_data.items():
+            if hasattr(review, key):
+                setattr(review, key, value)
+        return review
+
+
+    def delete_review(self, review_id):
+        # Placeholder for logic to delete a review
+        delete_review = self.review_repo.get(review_id)
+        if not delete_review:
+            return False
+        self.review_repo.delete(review_id)
+        return True
+
+
