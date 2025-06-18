@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-from base_model import BaseModel
-from place import Place
-from user import User
+from hbnb.app.models.base_model import BaseModel
+from hbnb.app.models.place import Place
+from hbnb.app.models.user import User
 
 
 class Review(BaseModel):

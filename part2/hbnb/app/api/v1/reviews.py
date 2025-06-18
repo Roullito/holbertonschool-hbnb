@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from app.services import facade
+from hbnb.app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
