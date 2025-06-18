@@ -56,9 +56,9 @@ class HBnBFacade:
         return amenity
 
     def create_place(self, place_data):
-            place = Place(**place_data)
-            self.place_repo.add(place)
-            return place
+        place = Place(**place_data)
+        self.place_repo.add(place)
+        return place
 
     def get_place(self, place_id):
         return self.place_repo.get(place_id)
@@ -109,7 +109,6 @@ class HBnBFacade:
                 setattr(review, key, value)
         return review
 
-
     def delete_review(self, review_id):
         # Placeholder for logic to delete a review
         delete_review = self.review_repo.get(review_id)
@@ -117,5 +116,3 @@ class HBnBFacade:
             return False
         self.review_repo.delete(review_id)
         return True
-
-
