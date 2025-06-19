@@ -1,116 +1,120 @@
-# 🧩 Sequence Diagram - User Registration
+# Sequence Diagrams for API Calls
 
-This sequence diagram shows how a new user is register in the HBnB application.
-It demonstrates the flow of data through the API, service, and database layers.
+## Explanatory Notes
 
----
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant API
-    participant UserService
-    participant Database
-
-    User->>API: POST /users (email, password, name)
-    API->>UserService: validate(email, password, name)
-    UserService->>Database: Save new User to DB
-    Database-->>UserService: Comfirm Save
-    UserService-->>API: Return Response
-	API-->>User: Return Success/Failure
-
-```
-
-### 👤 User Registration – Sequence Description
-
-This diagram illustrates the process when a user registers on the HBnB platform.
-The API receives the user's data and delegates the operation to the `UserService`,
-which validates the input and creates a new `User` object. The `UserRepository`
-then persists the data to the database. A success or error response is returned to the client.
-
-# 🧩 Sequence Diagram – Place Creation
-
-This sequence diagram shows how a new place is created in the HBnB application.
-It demonstrates the flow of data through the API, service, and database layers.
+These sequence diagrams illustrate how the system components interact to perform key operations through the API. Each scenario involves communication between the frontend (Client), the Presentation Layer (API), the Business Logic Layer (Logic), and the Persistence Layer (Database).
 
 ---
 
+### 1. **User Registration**
+
+**Description**: Handles user signup by validating input, hashing passwords, storing user data, and returning a clean response.
+
 ```mermaid
 sequenceDiagram
-title Place Creation Flow
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-participant User
-participant API
-participant PlaceService
-participant Database
+    Note over Client: The user fills out the registration form
+    Client->>API: POST /api/users {first_name, last_name, email, password}
 
-User ->> API: Submit new place datas (e.g., title, location, price)
-API ->> PlaceService: Validate and create Place
-PlaceService ->> Database: Save new place to DB
-Database -->> PlaceService: Confirm Save
-PlaceService -->> API: Return Response
-API -->> User: Return Success/Failure
+    Note over API: Validate input data (presence, format, email uniqueness)
+    API->>Logic: register_user(data: dict)
 
+    Note over Logic: Hash password, generate UUID, timestamps
+    Logic->>DB: INSERT INTO users (uuid, first_name, last_name, email, hashed_password, is_admin, created_at, updated_at)
+
+    DB-->>Logic: Return new user ID and confirmation
+    Logic-->>API: Return user object (without password)
+    API-->>Client: 201 Created + JSON {id, first_name, last_name, email, is_admin, created_at}
 ```
-
-# 🏠 Place Creation - Sequence Description
-
-User sends place information like title, location, and price. The API forwards the request to the PlaceService. PlaceService checks the data and builds a new Place object. The Database saves the new place entry. A confirmation is sent back up through the layers. The User receives a message indicating if the place creation succeeded or failed.
-
-# 🧩 Sequence Diagram – Review Submission
-
-This sequence diagram explains how a user submits a review for a place in the HBnB platform.
-It highlights the interaction between the user, API, service logic, and data storage.
 
 ---
 
+### 2. **Place Creation**
+
+**Description**: Allows a user to create a new place listing, validating and storing the data before returning the created object.
+
 ```mermaid
 sequenceDiagram
-title Review Submission Flow
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-participant User
-participant API
-participant ReviewService
-participant Database
+    Note over Client: User submits a new place listing form
+    Client->>API: POST /api/places {title, description, price, lat, long}
 
-User ->> API: Submit review (e.g., rating, comment, place_id)
-API ->> ReviewService: Validate and create Review
-ReviewService ->> Database: Save review to DB
-Database -->> ReviewService: Confirm Save
-ReviewService -->> API: Return Response
-API -->> User: Return Success/Failure
+    Note right of API: Validates input data (types, required fields)
+    API->>Logic: create_place(data)
+
+    Note right of Logic: Validate data, associate current user as owner<br>Generate UUID, set created_at/updated_at<br>Sanitize fields if necessary
+    Logic->>DB: INSERT INTO places (id, user_id, title, description, price, latitude, longitude, created_at, updated_at)
+
+    Note right of DB: Save the new place entry<br>Return newly created place ID
+    DB-->>Logic: Return place_id
+    Logic-->>API: Return created place object (JSON, no internal fields)
+    API-->>Client: 201 Created + JSON {id, title, description, price, lat, long}
+
+    Note right of Client: Displays success message and new place
 
 ```
-
-# 📝 Review Creation - Sequence Description
-
-User fills and submits a review form including comment and rating. The API captures the request and sends it to the ReviewService. ReviewService validates the input and builds a Review object. The Database stores the new review. A confirmation goes back up through the service and API. The User receives a success or error message.
-
-# 🧩 Sequence Diagram – Fetching a List of Places
-
-This sequence diagram shows how the HBnB system handles a request to fetch a filtered list of available places.
-It outlines how the request travels through the API, is processed by the business logic, and retrieves data from the database.
 
 ---
 
+### 3. **Review Submission**
+
+**Description**: Submits a review for a place. The system ensures proper authorization and stores the review data.
+
 ```mermaid
 sequenceDiagram
-title Fetching Places Flow
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-participant User
-participant API
-participant PlaceService
-participant Database
+    Client->>API: POST /api/reviews {place_id, rating, comment}
+    Note right of Client: Authenticated user
 
-User ->> API: Request list of places (with filters)
-API ->> PlaceService: Apply filters and fetch places
-PlaceService ->> Database: Query matching places
-Database -->> PlaceService: Return place list
-PlaceService -->> API: Return data
-API -->> User: Send list of places
+    API->>Logic: create_review(data: dict, user_id: str)
+    Note right of API: Extract user ID from auth token
+
+    Logic->>DB: INSERT INTO reviews (user_id, place_id, rating, comment, created_at, updated_at)
+    Note right of Logic: Business logic validates data and creates review
+
+    DB-->>Logic: Return review ID and confirmation
+    Logic-->>API: Return review object as dict
+    API-->>Client: 201 Created + JSON {id, user_id, place_id, rating, comment, created_at, updated_at}
 
 ```
 
-# 📝 Fetching a List of Places - Sequence Description
+---
 
-User sends a request to retrieve places, possibly with filters (e.g., location, price, amenities). The API layer receives and forwards the request to the PlaceService. PlaceService applies the filters and queries the Database. The Database returns the list of places that match the criteria. The list is passed back through the Service and API layers. The User receives the final filtered list of places.
+### 4. **Fetching a List of Places**
+
+**Description**: Retrieves a list of places filtered by criteria, including nested data like reviews and amenities for each place.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
+    Client->>API: GET /api/places?min_price=50&max_price=200&lat=45.5&long=3.2
+    API->>Logic: fetch_places(filters: dict)
+    Logic->>DB: SELECT * FROM places WHERE price BETWEEN 50 AND 200 AND location NEAR (lat, long)
+    DB-->>Logic: Return matching places
+    loop For each place
+        Logic->>DB: SELECT * FROM reviews WHERE place_id = place.id
+        Logic->>DB: SELECT * FROM amenities WHERE place_id = place.id
+    end
+    Logic-->>API: Return list of place objects with reviews and amenities
+    API-->>Client: 200 OK + JSON [\n  {id, title, price, lat, long, reviews[], amenities[]},\n  {...}\n]
+    
+```
