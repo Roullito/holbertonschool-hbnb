@@ -56,7 +56,12 @@ class HBnBFacade:
         return amenity
 
     def create_place(self, place_data):
-        place = Place(**place_data)
+        owner_id = place_data.pop('owner')
+        owner = self.get_user(owner_id)
+        if not owner:
+            raise ValueError("Owner not found")
+
+        place = Place(owner=owner, **place_data)
         self.place_repo.add(place)
         return place
 
@@ -76,8 +81,18 @@ class HBnBFacade:
         return place
 
     def create_review(self, review_data):
-        # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
-        review = Review(**review_data)
+        user_id = review_data.pop('user')
+        place_id = review_data.pop('place')
+
+        user = self.get_user(user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        place = self.get_place(place_id)
+        if not place:
+            raise ValueError("Place not found")
+
+        review = Review(user=user, place=place, **review_data)
         self.review_repo.add(review)
         return review
 
@@ -116,3 +131,5 @@ class HBnBFacade:
             return False
         self.review_repo.delete(review_id)
         return True
+
+facade = HBnBFacade()
