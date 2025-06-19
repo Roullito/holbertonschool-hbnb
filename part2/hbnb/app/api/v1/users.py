@@ -1,3 +1,11 @@
+"""
+API endpoints for managing users in the HBnB application.
+
+This module defines routes to register, list, retrieve, and update users.
+All business logic is handled by the HBnBFacade.
+"""
+
+
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services import HBnBFacade
 
@@ -14,15 +22,28 @@ user_model = api.model('User', {
     'email': fields.String(required=True, description='Email of the user')
 })
 
+
 @api.route('/')
 class UserList(Resource):
+    """
+    Operations on the collection of users.
+
+    POST: Register a new user.
+    GET:  Retrieve a list of all users.
+    """
     # POST /api/v1/users/ : Create a new user
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user"""
+        """
+        Register a new user.
+
+        Returns:
+            tuple: The new user's data and HTTP 201 on success,
+                   or an error message and HTTP 400 on failure.
+        """
         user_data = api.payload
 
         # Check if email is already registered
@@ -41,17 +62,38 @@ class UserList(Resource):
     @api.marshal_list_with(user_model)
     @api.response(200, 'List of users')
     def get(self):
-        """Get all users"""
+        """
+        Retrieve all registered users.
+
+        Returns:
+            tuple: List of user data dictionaries and HTTP 200.
+        """
         users = facade.get_all_users()
         return [u.to_dict() for u in users], 200
 
+
 @api.route('/<user_id>')
 class UserResource(Resource):
+    """
+    Operations on a single user item.
+
+    GET: Retrieve user details by ID.
+    PUT: Update an existing user by ID.
+    """
     # GET /api/v1/users/<user_id> : Return a user by ID
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID"""
+        """
+        Retrieve a user by ID.
+
+        Args:
+            user_id (str): Unique identifier of the user.
+
+        Returns:
+            tuple: User data dictionary and HTTP 200 on success,
+                   or error message and HTTP 404 if not found.
+        """
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -62,7 +104,16 @@ class UserResource(Resource):
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
     def put(self, user_id):
-        """Update user by ID"""
+        """
+        Update an existing user by ID.
+
+        Args:
+            user_id (str): Unique identifier of the user.
+
+        Returns:
+            tuple: Updated user data dictionary and HTTP 200 on success,
+                   or error message and HTTP 404 if not found.
+        """
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
