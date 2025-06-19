@@ -124,6 +124,7 @@ By the end of this project, you will have:
 
 - [Alexis Cornillon](https://github.com/Alexiscnl)
 - [Jules Moleins](https://github.com/Roullito)
+- [Benoit Maingon](https://github.com/BenoitMain)
 
 ---
 
