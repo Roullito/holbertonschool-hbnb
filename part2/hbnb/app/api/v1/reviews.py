@@ -1,3 +1,21 @@
+"""
+API endpoints for managing reviews in the HBnB application.
+
+This module defines the endpoints for creating, retrieving, updating,
+and deleting reviews, as well as retrieving reviews for a specific place.
+
+Namespace:
+    /api/v1/reviews
+
+Models:
+    Review: Defines the expected input and output structure for reviews.
+
+Classes:
+    - ReviewList: Handles POST and GET for all reviews.
+    - ReviewResource: Handles GET, PUT, DELETE for a specific review.
+    - PlaceReviewList: Handles GET for reviews related to a specific place.
+"""
+
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from hbnb.app.services import facade
@@ -12,13 +30,21 @@ review_model = api.model('Review', {
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
+
 @api.route('/')
 class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new review"""
+        """Create a new review.
+
+        Validates the rating and uses the facade to persist a new review.
+
+        Returns:
+            tuple: A dictionary of the new review and status code 201 if success.
+                Error message and 400 or 500 on failure.
+        """
         try:
             review_data = api.payload
 
@@ -64,12 +90,20 @@ class ReviewList(Resource):
         except Exception as e:
             return {'error': 'Internal server error'}, 500
 
+
 @api.route('/<review_id>')
 class ReviewResource(Resource):
     @api.response(200, 'Review details retrieved successfully')
     @api.response(404, 'Review not found')
     def get(self, review_id):
-        """Get review details by ID"""
+        """Retrieve a review by its ID.
+
+        Args:
+            review_id (str): The ID of the review to retrieve.
+
+        Returns:
+            tuple: Review data and status code 200, or error and 404 if not found.
+        """
         try:
             review = facade.get_review(review_id)
             if not review:
@@ -92,7 +126,14 @@ class ReviewResource(Resource):
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
-        """Update a review's information"""
+        """Update an existing review by its ID.
+
+        Args:
+            review_id (str): The ID of the review to update.
+
+        Returns:
+            tuple: Updated review data and status code 200, or error and status.
+        """
         try:
             review_data = api.payload
 
@@ -121,7 +162,14 @@ class ReviewResource(Resource):
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
     def delete(self, review_id):
-        """Delete a review"""
+        """Delete a review by its ID.
+
+        Args:
+            review_id (str): The ID of the review to delete.
+
+        Returns:
+            tuple: Success message and 200, or error and 404 if not found.
+        """
         try:
             success = facade.delete_review(review_id)
             if not success:
@@ -131,12 +179,21 @@ class ReviewResource(Resource):
         except Exception as e:
             return {'error': 'Internal server error'}, 500
 
+
 @api.route('/places/<place_id>/reviews')
 class PlaceReviewList(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
-        """Get all reviews for a specific place"""
+        """Retrieve all reviews for a specific place.
+
+        Args:
+            place_id (str): The ID of the place.
+
+        Returns:
+            tuple: List of reviews and 200 if found,
+                or error and 404 if place not found.
+        """
         try:
             # First check if place exists
             place = facade.get_place(place_id)
