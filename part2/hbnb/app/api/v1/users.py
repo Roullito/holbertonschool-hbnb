@@ -31,8 +31,11 @@ class UserList(Resource):
             return {'error': 'Email already registered'}, 400
 
         # Create and return the new user
-        new_user = facade.create_user(user_data)
-        return new_user.to_dict()
+        try:
+            new_user = facade.create_user(user_data)
+        except (TypeError, ValueError) as e:
+            return {"error": str(e)}, 400
+        return new_user.to_dict(), 201
 
     # GET /api/v1/users/ : Return all users
     @api.marshal_list_with(user_model)

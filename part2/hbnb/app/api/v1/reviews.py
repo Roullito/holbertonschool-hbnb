@@ -32,14 +32,16 @@ class ReviewList(Resource):
                 'id': new_review.id,
                 'text': new_review.text,
                 'rating': new_review.rating,
-                'user_id': new_review.user_id,
-                'place_id': new_review.place_id,
+                'user_id': new_review.user.id,
+                'place_id': new_review.place.id,
                 'created_at': new_review.created_at.isoformat(),
                 'updated_at': new_review.updated_at.isoformat()
             }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return {'error': 'Internal server error'}, 500
 
     @api.response(200, 'List of reviews retrieved successfully')
