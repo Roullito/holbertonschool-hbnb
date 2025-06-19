@@ -83,7 +83,7 @@ Access the Swagger UI at:
 
 * Jules Moleins
 * Alexis Cornillon
-* et surtout pas Benoît Maingon
+* Benoît Maingon
 
 ## 📚 References
 
