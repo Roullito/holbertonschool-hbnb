@@ -1,4 +1,4 @@
-# HBnB – Technical Documentation (Part 1)
+# HBnB – Technical Documentation
 
 This document serves as the foundation for the development of the HBnB Evolution project. It compiles all technical diagrams and design decisions made during the first part of the project, helping developers and collaborators understand the overall architecture, business logic, and flow of interactions within the system.
 
@@ -25,44 +25,6 @@ This document presents the full architectural overview, including:
 
 ```mermaid
 classDiagram
-
-class PresentationLayer {
-    <<Interface>>
-    +API
-    +UserService
-}
-
-class BusinessLogicLayer {
-    +User
-    +Place
-    +Review
-    +Amenity
-}
-
-class PersistenceLayer {
-    +DataBaseAccess
-}
-
-PresentationLayer --> BusinessLogicLayer : uses (via Facade Services)
-BusinessLogicLayer --> PersistenceLayer : accesses (via Repositories)
-```
-
-### ✅ Layer Descriptions
-
-* **Presentation Layer**: Entry point for client/API interactions via services.
-* **Business Logic Layer**: Core domain models with rules and logic.
-* **Persistence Layer**: Handles data storage/retrieval via repositories.
-
-### ✅ Facade Pattern
-
-Used to centralize business logic inside services and prevent direct access to data layers from the API.
-
----
-
-## 🧩 Business Logic Layer – Class Diagram
-
-```mermaid
-classDiagram
 class User {
   +UUID id
   +str first_name
@@ -83,6 +45,7 @@ class Place {
   +float price
   +float latitude
   +float longitude
+  +str owner
   +datetime created_at
   +datetime updated_at
   +create()
@@ -93,6 +56,8 @@ class Review {
   +UUID id
   +int rating
   +str comment
+  +str place
+  +str user
   +datetime created_at
   +datetime updated_at
   +submit()
@@ -112,7 +77,8 @@ class Amenity {
 User --> Place : owns
 User --> Review : writes
 Place --> Review : receives
-Place --> "*" Amenity : has
+Place --> Amenity : has >*
+
 ```
 
 ### ✅ Entity Descriptions
@@ -130,18 +96,24 @@ Place --> "*" Amenity : has
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant API
-    participant UserService
-    participant Database
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-    User->>API: POST /users (email, password, name)
-    API->>UserService: validate(email, password, name)
-    UserService->>Database: Save new User to DB
-    Database-->>UserService: Comfirm Save
-    UserService-->>API: Return Response
-	API-->>User: Return Success/Failure
+    Note over Client: The user fills out the registration form
+    Client->>API: POST /api/users {first_name, last_name, email, password}
 
+    Note over API: Validate input data (presence, format, email uniqueness)
+    API->>Logic: register_user(data: dict)
+
+    Note over Logic: Hash password, generate UUID, timestamps
+    Logic->>DB: INSERT INTO users (uuid, first_name, last_name, email, hashed_password, is_admin, created_at, updated_at)
+
+    DB-->>Logic: Return new user ID and confirmation
+    Logic-->>API: Return user object (without password)
+    API-->>Client: 201 Created + JSON {id, first_name, last_name, email, is_admin, created_at}
 ```
 
 **Description**: User sends registration data → API → Service → Repository → Confirmation response.
@@ -152,19 +124,27 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-title Place Creation Flow
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-participant User
-participant API
-participant PlaceService
-participant Database
+    Note over Client: User submits a new place listing form
+    Client->>API: POST /api/places {title, description, price, lat, long}
 
-User ->> API: Submit new place datas (e.g., title, location, price)
-API ->> PlaceService: Validate and create Place
-PlaceService ->> Database: Save new place to DB
-Database -->> PlaceService: Confirm Save
-PlaceService -->> API: Return Response
-API -->> User: Return Success/Failure
+    Note right of API: Validates input data (types, required fields)
+    API->>Logic: create_place(data)
+
+    Note right of Logic: Validate data, associate current user as owner<br>Generate UUID, set created_at/updated_at<br>Sanitize fields if necessary
+    Logic->>DB: INSERT INTO places (id, user_id, title, description, price, latitude, longitude, created_at, updated_at)
+
+    Note right of DB: Save the new place entry<br>Return newly created place ID
+    DB-->>Logic: Return place_id
+    Logic-->>API: Return created place object (JSON, no internal fields)
+    API-->>Client: 201 Created + JSON {id, title, description, price, lat, long}
+
+    Note right of Client: Displays success message and new place
 
 ```
 
@@ -176,19 +156,24 @@ API -->> User: Return Success/Failure
 
 ```mermaid
 sequenceDiagram
-title Review Submission Flow
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
 
-participant User
-participant API
-participant ReviewService
-participant Database
+    Client->>API: POST /api/reviews {place_id, rating, comment}
+    Note right of Client: Authenticated user
 
-User ->> API: Submit review (e.g., rating, comment, place_id)
-API ->> ReviewService: Validate and create Review
-ReviewService ->> Database: Save review to DB
-Database -->> ReviewService: Confirm Save
-ReviewService -->> API: Return Response
-API -->> User: Return Success/Failure
+    API->>Logic: create_review(data: dict, user_id: str)
+    Note right of API: Extract user ID from auth token
+
+    Logic->>DB: INSERT INTO reviews (user_id, place_id, rating, comment, created_at, updated_at)
+    Note right of Logic: Business logic validates data and creates review
+
+    DB-->>Logic: Return review ID and confirmation
+    Logic-->>API: Return review object as dict
+    API-->>Client: 201 Created + JSON {id, user_id, place_id, rating, comment, created_at, updated_at}
 
 ```
 
@@ -200,19 +185,21 @@ API -->> User: Return Success/Failure
 
 ```mermaid
 sequenceDiagram
-title Fetching Places Flow
-
-participant User
-participant API
-participant PlaceService
-participant Database
-
-User ->> API: Request list of places (with filters)
-API ->> PlaceService: Apply filters and fetch places
-PlaceService ->> Database: Query matching places
-Database -->> PlaceService: Return place list
-PlaceService -->> API: Return data
-API -->> User: Send list of places
+    autonumber
+    participant Client as User (Frontend)
+    participant API as API (Presentation Layer)
+    participant Logic as Business Logic Layer
+    participant DB as Persistence Layer (Database)
+    Client->>API: GET /api/places?min_price=50&max_price=200&lat=45.5&long=3.2
+    API->>Logic: fetch_places(filters: dict)
+    Logic->>DB: SELECT * FROM places WHERE price BETWEEN 50 AND 200 AND location NEAR (lat, long)
+    DB-->>Logic: Return matching places
+    loop For each place
+        Logic->>DB: SELECT * FROM reviews WHERE place_id = place.id
+        Logic->>DB: SELECT * FROM amenities WHERE place_id = place.id
+    end
+    Logic-->>API: Return list of place objects with reviews and amenities
+    API-->>Client: 200 OK + JSON [\n  {id, title, price, lat, long, reviews[], amenities[]},\n  {...}\n]
 
 ```
 
