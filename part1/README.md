@@ -216,3 +216,4 @@ This document covers the full technical blueprint of the HBnB application's arch
 * Visual sequence flows for major use cases
 
 This file should be kept updated as development progresses in the next phases.
+
