@@ -19,6 +19,7 @@ Classes:
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from hbnb.app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('reviews', description='Review operations')
 
@@ -36,6 +37,7 @@ class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Create a new review.
 
@@ -45,8 +47,18 @@ class ReviewList(Resource):
             tuple: A dictionary of the new review and status code 201 if success.
                 Error message and 400 or 500 on failure.
         """
+        current_user_id = get_jwt_identity()
         try:
             review_data = api.payload
+            place = facade.get_place(review_data["place_id"])
+            if place.owner_id == current_user_id:
+                return {"error": "You cannot review your own place."}, 400
+
+            existing_review = facade.get_review_by_user_and_place(
+                current_user_id, review_data["place_id"])
+            if existing_review:
+                return {"error": "You have already reviewed this place."}, 400
+            review_data["user_id"] = current_user_id
 
             # Validate rating range
             if not (1 <= review_data['rating'] <= 5):
@@ -125,6 +137,7 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, review_id):
         """Update an existing review by its ID.
 
@@ -134,8 +147,12 @@ class ReviewResource(Resource):
         Returns:
             tuple: Updated review data and status code 200, or error and status.
         """
+        current_user_id = get_jwt_identity()
         try:
             review_data = api.payload
+            review = facade.get_review(review_id)
+            if review.user_id != current_user_id:
+                return {"error": "Unauthorized action"}, 403
 
             # Validate rating range if provided
             if 'rating' in review_data and not (1 <= review_data['rating'] <= 5):
@@ -161,6 +178,7 @@ class ReviewResource(Resource):
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
+    @jwt_required()
     def delete(self, review_id):
         """Delete a review by its ID.
 
@@ -170,7 +188,11 @@ class ReviewResource(Resource):
         Returns:
             tuple: Success message and 200, or error and 404 if not found.
         """
+        current_user_id = get_jwt_identity()
         try:
+            review = facade.get_review(review_id)
+            if review.user_id != current_user_id:
+                return {"error": "Unauthorized action"}, 403
             success = facade.delete_review(review_id)
             if not success:
                 return {'error': 'Review not found'}, 404
