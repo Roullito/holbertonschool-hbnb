@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from hbnb.app.services import facade
 """
 This module defines RESTful API endpoints for managing amenities in  HBnB app.
@@ -32,13 +33,16 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required
     def post(self):
         """
-        Create a new amenity.
-
-        Returns:
-            tuple: JSON response and HTTP status code.
+        Register a new amenity (Admin only)
         """
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        if not current_user or not current_user.is_admin:
+            return {"error": "Admin access required"}, 403
         amenity_data = api.payload
         try:
             new_amenity = facade.create_amenity(amenity_data)
@@ -81,16 +85,18 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required
     def put(self, amenity_id):
         """
-        Update an existing amenity.
-
-        Args:
-            amenity_id (str): The ID of the amenity to update.
-
-        Returns:
-            tuple: Updated amenity or error and HTTP status code.
+        Update an amenity (Admin only)
         """
+
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        if not current_user or not current_user.is_admin:
+            return {"error": "Admin access required"}, 403
+
         amenity_data = api.payload
         updated_amenity = facade.update_amenity(amenity_id, amenity_data)
 
