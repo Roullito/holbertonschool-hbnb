@@ -8,6 +8,7 @@ All business logic is handled by the HBnBFacade.
 
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services import HBnBFacade
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # Create an instance of the business logic facade
 facade = HBnBFacade()
@@ -107,6 +108,7 @@ class UserResource(Resource):
     @api.expect(user_model, validate=True)
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
+    @jwt_required()
     def put(self, user_id):
         """
         Update an existing user by ID.
@@ -118,10 +120,15 @@ class UserResource(Resource):
             tuple: Updated user data dictionary and HTTP 200 on success,
                    or error message and HTTP 404 if not found.
         """
+        current_user_id = get_jwt_identity()
+        if user_id != current_user_id:
+            return {"error": "Unauthorized action"}, 403
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
 
         # Update user data and return the updated user
+        if 'email' in api.payload or 'password' in api.payload:
+            return {"error": "You cannot modify email or password."}, 400
         updated_user = facade.update_user(user_id, api.payload)
         return updated_user.to_dict(), 200

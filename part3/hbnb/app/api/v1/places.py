@@ -10,6 +10,8 @@ Each place is linked to a user (owner) and a list of amenities.
 from hbnb.app.models.base_model import BaseModel
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 api = Namespace('places', description='Place operations')
 
@@ -43,6 +45,7 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """
         Create a new place.
@@ -50,7 +53,10 @@ class PlaceList(Resource):
         Returns:
             tuple: JSON response with new place or error, and HTTP status code.
         """
+
         data = api.payload
+        current_user_id = get_jwt_identity()
+        data["owner_id"] = current_user_id
         try:
             place = facade.create_place(data)
             return place.to_dict(), 201
@@ -79,7 +85,6 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """
         Retrieve a place by ID.
-
         Args:
             place_id (str): The ID of the place to retrieve.
 
@@ -101,6 +106,7 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         """
         Update an existing place.
@@ -112,7 +118,11 @@ class PlaceResource(Resource):
             tuple: Updated place data or error, and HTTP status code.
         """
         data = api.payload
-        place = facade.update_place(place_id, data)
+        current_user_id = get_jwt_identity()
+        place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
-        return place.to_dict(), 200
+        if place.owner_id != current_user_id:
+            return {"error": "Unauthorized action"},403
+        update_place = facade.update_place(place_id, data)
+        return update_place.to_dict(), 200
