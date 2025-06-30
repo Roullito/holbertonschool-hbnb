@@ -42,9 +42,16 @@ class HBnBFacade:
         Returns:
             User: The newly created User object.
         """
-        user = User(**user_data)
+        user = User(
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name'],
+            email=user_data['email'],
+            is_admin=user_data.get('is_admin', False)
+        )
+        user.hash_password(user_data['password'])
         self.user_repo.add(user)
         return user
+
 
     def get_user(self, user_id):
         """
