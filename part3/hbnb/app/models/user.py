@@ -6,7 +6,6 @@ Inherits from BaseModel, providing id and timestamp fields.
 """
 
 from hbnb.app.models.base_model import BaseModel
-from hbnb.app import bcrypt
 
 
 class User(BaseModel):
@@ -77,8 +76,10 @@ class User(BaseModel):
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
+        from hbnb.app import bcrypt
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
+        from hbnb.app import bcrypt
         return bcrypt.check_password_hash(self.password, password)
