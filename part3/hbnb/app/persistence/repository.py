@@ -4,7 +4,7 @@ Defines the repository interface and an in-memory implementation for HBnB.
 The Repository ABC declares CRUD and lookup methods. InMemoryRepository
 implements these using a simple dict for storage.
 """
-
+from hbnb.app.extensions import db
 from abc import ABC, abstractmethod
 from hbnb.app.models.user import User
 from hbnb.app.models.place import Place
@@ -174,7 +174,6 @@ class InMemoryRepository(Repository):
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
-        from hbnb.app import db
 
     def add(self, obj):
         db.session.add(obj)
