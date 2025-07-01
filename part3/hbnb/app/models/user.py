@@ -6,6 +6,7 @@ Inherits from BaseModel, providing id and timestamp fields.
 """
 
 from hbnb.app.models.base_model import BaseModel
+from hbnb.app.extensions import db
 
 
 class User(BaseModel):
@@ -19,10 +20,19 @@ class User(BaseModel):
         first_name (str): User's first name (max 50 chars).
         last_name (str): User's last name (max 50 chars).
         email (str): User's email address (must contain '@').
+        password (str): Hashed password.
         is_admin (bool): Flag indicating admin privileges.
     """
 
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    __tablename__ = 'users'
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+
+    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
         """
         Initialize a new User instance with validation.
 
@@ -30,6 +40,7 @@ class User(BaseModel):
             first_name (str): First name (max 50 characters).
             last_name (str): Last name (max 50 characters).
             email (str): Email address (must contain '@').
+            password (str, optional): Raw password to be hashed.
             is_admin (bool, optional): Admin flag. Defaults to False.
 
         Raises:
@@ -58,6 +69,9 @@ class User(BaseModel):
 
         self.is_admin = is_admin
 
+        if password:
+            self.hash_password(password)
+
     def to_dict(self):
         """
         Serialize the user to a dictionary, excluding sensitive fields.
@@ -81,4 +95,4 @@ class User(BaseModel):
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         from hbnb.app import bcrypt
-        return bcrypt.check_password_hash(self.password, password)
+        return bcrypt.check_password_hash(self.password.encode('utf-8'), password)
