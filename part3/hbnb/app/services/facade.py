@@ -5,7 +5,8 @@ The facade provides methods to create, retrieve, update, and delete users,
 places, reviews, and amenities via in-memory repositories.
 """
 
-from hbnb.app.persistence.repository import InMemoryRepository
+from hbnb.app.persistence.repository import SQLAlchemyRepository
+from hbnb.app import db
 from hbnb.app.models.user import User
 from hbnb.app.models.amenity import Amenity
 from hbnb.app.models.place import Place
@@ -17,20 +18,20 @@ class HBnBFacade:
     Facade for HBnB business logic using in-memory repositories.
 
     Attributes:
-        user_repo (InMemoryRepository): Storage for User objects.
-        place_repo (InMemoryRepository): Storage for Place objects.
-        review_repo (InMemoryRepository): Storage for Review objects.
-        amenity_repo (InMemoryRepository): Storage for Amenity objects.
+        user_repo (SQLAlchemyRepository): Storage for User objects.
+        place_repo (SQLAlchemyRepository): Storage for Place objects.
+        review_repo (SQLAlchemyRepository): Storage for Review objects.
+        amenity_repo (SQLAlchemyRepository): Storage for Amenity objects.
     """
 
     def __init__(self):
         """
         Initialize all repositories for each entity type.
         """
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User) # Switched to SQLAlchemyRepository
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
         """
@@ -103,6 +104,7 @@ class HBnBFacade:
         for key, value in new_data.items():
             if hasattr(user, key):
                 setattr(user, key, value)
+        db.session.commit()
         return user
 
     def create_amenity(self, amenity_data):
@@ -157,6 +159,7 @@ class HBnBFacade:
         for key, value in amenity_data.items():
             if hasattr(amenity, key):
                 setattr(amenity, key, value)
+        db.session.commit()
         return amenity
 
     def create_place(self, place_data):
@@ -218,6 +221,7 @@ class HBnBFacade:
         for key, value in place_data.items():
             if hasattr(place, key):
                 setattr(place, key, value)
+        db.session.commit()
         return place
 
     def create_review(self, review_data):
@@ -233,8 +237,8 @@ class HBnBFacade:
         Raises:
             ValueError: If specified user or place is not found.
         """
-        user_id = review_data.pop('user')
-        place_id = review_data.pop('place')
+        user_id = review_data.pop('user_id')
+        place_id = review_data.pop('place_id')
         user = self.get_user(user_id)
         if not user:
             raise ValueError("User not found")
@@ -297,6 +301,7 @@ class HBnBFacade:
         for key, value in review_data.items():
             if hasattr(review, key):
                 setattr(review, key, value)
+        db.session.commit()
         return review
 
     def delete_review(self, review_id):

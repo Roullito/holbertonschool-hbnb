@@ -29,6 +29,8 @@ class Config:
 class DevelopmentConfig(Config):
     """Configuration for development environment."""
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class TestingConfig(Config):
     """Configuration for testing environment."""
@@ -38,3 +40,10 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     """Configuration for production environment."""
     DEBUG = False
+
+config = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}

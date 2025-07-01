@@ -139,20 +139,21 @@ class ReviewResource(Resource):
     @api.response(400, 'Invalid input data')
     @jwt_required()
     def put(self, review_id):
-        """Update an existing review by its ID.
-
-        Args:
-            review_id (str): The ID of the review to update.
-
-        Returns:
-            tuple: Updated review data and status code 200, or error and status.
+        """
+        Update an existing review by its ID.
         """
         current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        review = facade.get_review(review_id)
+        if not review:
+            return {'error': 'Review not found'}, 404
+
+        if not current_user.is_admin and review.user_id != current_user_id:
+            return {"error": "Unauthorized"}, 403
+
         try:
             review_data = api.payload
-            review = facade.get_review(review_id)
-            if review.user_id != current_user_id:
-                return {"error": "Unauthorized action"}, 403
 
             # Validate rating range if provided
             if 'rating' in review_data and not (1 <= review_data['rating'] <= 5):
@@ -180,25 +181,26 @@ class ReviewResource(Resource):
     @api.response(404, 'Review not found')
     @jwt_required()
     def delete(self, review_id):
-        """Delete a review by its ID.
-
-        Args:
-            review_id (str): The ID of the review to delete.
-
-        Returns:
-            tuple: Success message and 200, or error and 404 if not found.
+        """
+            Delete a review by its ID.
         """
         current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        review = facade.get_review(review_id)
+        if not review:
+            return {'error': 'Review not found'}, 404
+
+        if not current_user.is_admin and review.user_id != current_user_id:
+            return {"error": "Unauthorized"}, 403
+
         try:
-            review = facade.get_review(review_id)
-            if review.user_id != current_user_id:
-                return {"error": "Unauthorized action"}, 403
             success = facade.delete_review(review_id)
             if not success:
                 return {'error': 'Review not found'}, 404
 
             return {'message': 'Review deleted successfully'}, 200
-        except Exception as e:
+        except Exception:
             return {'error': 'Internal server error'}, 500
 
 
