@@ -19,3 +19,5 @@ flask-bcrypt==1.0.1
 bcrypt==4.3.0
 PyJWT==2.10.1
 flask_jwt_extended==4.7.1
+sqlalchemy
+flask-sqlalchemy
