@@ -6,8 +6,13 @@ implements these using a simple dict for storage.
 """
 
 from abc import ABC, abstractmethod
-from hbnb.app import db  # Assuming you have set up SQLAlchemy in your Flask app
-from hbnb.app.models import User, Place, Review, Amenity  # Import your models
+from hbnb.app.models.user import User
+from hbnb.app.models.place import Place
+from hbnb.app.models.review import Review
+from hbnb.app.models.amenity import Amenity
+
+__all__ = ["User", "Place", "Review", "Amenity"]
+
 
 
 class Repository(ABC):
@@ -169,6 +174,7 @@ class InMemoryRepository(Repository):
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
+        from hbnb.app import db
 
     def add(self, obj):
         db.session.add(obj)
