@@ -6,8 +6,8 @@ implements these using a simple dict for storage.
 """
 
 from abc import ABC, abstractmethod
-from app import db  # Assuming you have set up SQLAlchemy in your Flask app
-from app.models import User, Place, Review, Amenity  # Import your models
+from hbnb.app import db  # Assuming you have set up SQLAlchemy in your Flask app
+from hbnb.app.models import User, Place, Review, Amenity  # Import your models
 
 
 class Repository(ABC):
