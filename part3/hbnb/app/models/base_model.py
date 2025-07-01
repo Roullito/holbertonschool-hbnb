@@ -7,8 +7,9 @@ utility methods for saving, updating attributes, and serializing to dict.
 
 import uuid
 from datetime import datetime
+from hbnb.app.extensions import db
 
-class BaseModel:
+class BaseModel(db.Model):
     """
     Core model class with common attributes and methods.
 
@@ -17,6 +18,11 @@ class BaseModel:
         created_at (datetime): Timestamp of creation.
         updated_at (datetime): Timestamp of last update.
     """
+    __abstract__ = True  # This ensures SQLAlchemy does not create a table for BaseModel
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self):
         """
