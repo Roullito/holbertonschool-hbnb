@@ -7,11 +7,8 @@ All business logic is handled by the HBnBFacade.
 
 
 from flask_restx import Namespace, Resource, fields
-from hbnb.app.services import HBnBFacade
+from hbnb.app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
-# Create an instance of the business logic facade
-facade = HBnBFacade()
 
 # Define the users namespace for the API
 api = Namespace('users', description='User operations')
