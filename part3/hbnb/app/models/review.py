@@ -6,8 +6,10 @@ and links to the Place and User instances.
 """
 
 from hbnb.app.models.base_model import BaseModel
+from sqlalchemy.orm import validates
 from hbnb.app.models.place import Place
 from hbnb.app.models.user import User
+from hbnb.app.extensions import db
 
 
 class Review(BaseModel):
@@ -23,6 +25,17 @@ class Review(BaseModel):
         place (Place): The Place instance being reviewed.
         user (User): The User instance who wrote the review.
     """
+    __tablename__ = 'review'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    text = db.Column(db.String(256), nullable=False)
+    rating = db.Column(db.Integer, nullable=False, unique=True)
+
+    @validates('rating')
+    def validate_rating(self, key, value):
+        if not 1 <= value <= 5:
+            raise ValueError("Rating must be between 1 and 5")
+        return value
 
     def __init__(self, text, rating, place, user):
         """
