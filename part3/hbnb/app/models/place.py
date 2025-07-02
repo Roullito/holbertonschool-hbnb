@@ -10,7 +10,11 @@ from hbnb.app.models.user import User
 from hbnb.app.models.amenity import Amenity
 from hbnb.app.extensions import db
 
-
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id', db.String(60), db.ForeignKey('place.id'), nullable=False),
+    db.Column('amenity_id', db.String(60), db.ForeignKey('amenity.id'), nullable=False)
+)
 class Place(BaseModel):
     """
     Represents a rental place in the HBnB application.
@@ -36,6 +40,10 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
+
+    user_id = db.Column(db.String(60), db.ForeignKey('users.id'), nullable=False)
+    amenities = db.relationship('Amenity', secondary=place_amenity, backref='places', viewonly=False)
+
 
     def __init__(
         self,
@@ -92,35 +100,4 @@ class Place(BaseModel):
             raise TypeError("Owner must be an instance of User")
         self.owner = owner
 
-        self.reviews = []
-        self.amenities = []
 
-    def add_review(self, review):
-        """
-        Add a Review instance to this place.
-
-        Args:
-            review (Review): An instance of the Review class.
-
-        Raises:
-            TypeError: If review is not a Review instance.
-        """
-        from review import Review
-        if not isinstance(review, Review):
-            raise TypeError("Review must be an instance of the Review class.")
-        self.reviews.append(review)
-
-    def add_amenity(self, amenity):
-        """
-        Add an Amenity instance to this place.
-
-        Args:
-            amenity (Amenity): An instance of the Amenity class.
-
-        Raises:
-            TypeError: If amenity is not an Amenity instance.
-        """
-        if not isinstance(amenity, Amenity):
-            raise TypeError("Amenity must be an instance of the Amenity class.")
-        if amenity not in self.amenities:
-            self.amenities.append(amenity)
