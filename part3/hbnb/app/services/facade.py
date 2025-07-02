@@ -7,8 +7,11 @@ places, reviews, and amenities via in-memory repositories.
 
 from hbnb.app.persistence.repository import SQLAlchemyRepository
 from hbnb.app.persistence.user_repository import UserRepository
+from hbnb.app.persistence.place_repository import PlaceRepository
+from hbnb.app.persistence.review_repository import ReviewRepository
+from hbnb.app.persistence.amenity_repository import AmenityRepository
 from hbnb.app.models.user import User
-from hbnb.app import db
+from hbnb.app.extensions import db
 from hbnb.app.models.user import User
 from hbnb.app.models.amenity import Amenity
 from hbnb.app.models.place import Place
@@ -31,9 +34,9 @@ class HBnBFacade:
         Initialize all repositories for each entity type.
         """
         self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
     def create_user(self, user_data):
         """

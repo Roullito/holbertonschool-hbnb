@@ -8,6 +8,7 @@ description, price, geographic coordinates, owner, reviews, and amenities.
 from hbnb.app.models.base_model import BaseModel
 from hbnb.app.models.user import User
 from hbnb.app.models.amenity import Amenity
+from hbnb.app.extensions import db
 
 
 class Place(BaseModel):
@@ -27,6 +28,14 @@ class Place(BaseModel):
         reviews (list): List of Review instances.
         amenities (list): List of Amenity instances.
     """
+    __tablename__ = 'place'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    title = db.Column(db.String(126), nullable=False)
+    description = db.Column(db.String(256), nullable=False, unique=True)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
 
     def __init__(
         self,

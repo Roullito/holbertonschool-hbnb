@@ -8,6 +8,7 @@ timestamps from BaseModel.
 """
 
 from hbnb.app.models.base_model import BaseModel
+from hbnb.app.extensions import db
 
 
 class Amenity(BaseModel):
@@ -20,6 +21,10 @@ class Amenity(BaseModel):
     Attributes:
         name (str): The name of the amenity, e.g. "WiFi" or "Pool".
     """
+    __tablename__ = 'amenity'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False)
 
     def __init__(self, name):
         """
