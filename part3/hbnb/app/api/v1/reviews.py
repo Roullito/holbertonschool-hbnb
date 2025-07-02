@@ -19,7 +19,7 @@ Classes:
 from flask_restx import Namespace, Resource, fields
 from flask import request
 from hbnb.app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('reviews', description='Review operations')
 
@@ -37,6 +37,7 @@ class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='Bearer')
     @jwt_required()
     def post(self):
         """Create a new review.
@@ -143,13 +144,14 @@ class ReviewResource(Resource):
         Update an existing review by its ID.
         """
         current_user_id = get_jwt_identity()
-        current_user = facade.get_user(current_user_id)
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not current_user.is_admin and review.user_id != current_user_id:
+        if not is_admin and review.user_id != current_user_id:
             return {"error": "Unauthorized"}, 403
 
         try:
@@ -185,13 +187,14 @@ class ReviewResource(Resource):
             Delete a review by its ID.
         """
         current_user_id = get_jwt_identity()
-        current_user = facade.get_user(current_user_id)
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not current_user.is_admin and review.user_id != current_user_id:
+        if not is_admin and review.user_id != current_user_id:
             return {"error": "Unauthorized"}, 403
 
         try:

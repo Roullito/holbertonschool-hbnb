@@ -106,9 +106,15 @@ class HBnBFacade:
         user = self.user_repo.get(user_id)
         if not user:
             return None
+
         for key, value in new_data.items():
             if hasattr(user, key):
-                setattr(user, key, value)
+                if key == 'password':
+                    # Hash the password before storing
+                    user.hash_password(value)
+                else:
+                    setattr(user, key, value)
+
         db.session.commit()
         return user
 

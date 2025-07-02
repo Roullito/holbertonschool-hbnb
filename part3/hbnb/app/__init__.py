@@ -22,7 +22,24 @@ def create_app(config_class="config.DevelopmentConfig"):
     from hbnb.app.api.v1.auth import api as auth_ns
     from hbnb.app.api.v1.protected import api as protected_ns
 
-    api = Api(app, version='1.0', title='HBnB API', description='HBnB Application API')
+    # Simple API setup with Bearer token support for Swagger testing
+    authorizations = {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'Enter: Bearer <your_token>'
+        }
+    }
+
+    api = Api(
+        app,
+        version='1.0',
+        title='HBnB API',
+        description='HBnB Application API',
+        authorizations=authorizations,
+        security='Bearer'
+    )
 
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
