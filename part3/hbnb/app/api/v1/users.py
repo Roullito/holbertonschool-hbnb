@@ -8,7 +8,7 @@ All business logic is handled by the HBnBFacade.
 
 from flask_restx import Namespace, Resource, fields
 from hbnb.app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 # Define the users namespace for the API
 api = Namespace('users', description='User operations')
@@ -35,14 +35,23 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Admin access required')
+    @api.doc(security='Bearer')
+    @jwt_required()
     def post(self):
         """
         Register a new user.
+        Only admins can create users through this endpoint.
 
         Returns:
             tuple: The new user's data and HTTP 201 on success,
-                   or an error message and HTTP 400 on failure.
+                   or an error message and HTTP 400/403 on failure.
         """
+        # Check if current user is admin
+        claims = get_jwt()
+        if not claims.get('is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
+
         user_data = api.payload
 
         # Check if email is already registered
@@ -105,28 +114,40 @@ class UserResource(Resource):
     @api.expect(user_model, validate=True)
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
+    @api.response(403, 'Unauthorized action')
+    @api.doc(security='Bearer')
     @jwt_required()
     def put(self, user_id):
         """
         Update user information.
-        Only admin or the user himself can update.
+        Admins can update any user including email/password.
+        Regular users can only update their own profile (excluding email/password).
         """
-
         current_user_id = get_jwt_identity()
-        current_user = facade.get_user(current_user_id)
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
-        if not current_user:
-            return {"error": "Unauthorized"}, 403
-
-        if not current_user.is_admin and user_id != current_user_id:
-            return {"error": "Unauthorized action"}, 403
-
+        # Check if user exists
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
 
-        # Update user data and return the updated user
-        if 'email' in api.payload or 'password' in api.payload:
+        # Authorization check
+        if not is_admin and user_id != current_user_id:
+            return {"error": "Unauthorized action"}, 403
+
+        user_data = api.payload
+
+        # Admin can modify email and password, regular users cannot
+        if not is_admin and ('email' in user_data or 'password' in user_data):
             return {"error": "You cannot modify email or password."}, 400
-        updated_user = facade.update_user(user_id, api.payload)
+
+        # If admin is changing email, check for uniqueness
+        if is_admin and 'email' in user_data:
+            existing_user = facade.get_user_by_email(user_data['email'])
+            if existing_user and existing_user.id != user_id:
+                return {'error': 'Email already in use'}, 400
+
+        # Update user data and return the updated user
+        updated_user = facade.update_user(user_id, user_data)
         return updated_user.to_dict(), 200

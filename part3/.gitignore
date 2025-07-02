@@ -4,6 +4,9 @@ env/
 .venv/
 .env/
 
+# Variables d'environnement (contient des secrets)
+.env
+
 # Fichiers de test
 test_*.py
 *.spec.py
