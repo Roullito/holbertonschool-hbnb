@@ -31,6 +31,9 @@ class Review(BaseModel):
     text = db.Column(db.String(256), nullable=False)
     rating = db.Column(db.Integer, nullable=False, unique=True)
 
+    user_id = db.Column(db.String(60), db.ForeignKey('users.id'), nullable=False)
+    place_id = db.Column(db.String(60), db.ForeignKey('place.id'), nullable=False)
+
     @validates('rating')
     def validate_rating(self, key, value):
         if not 1 <= value <= 5:
