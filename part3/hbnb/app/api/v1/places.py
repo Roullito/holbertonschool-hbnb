@@ -35,7 +35,7 @@ place_model = api.model('Place', {
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
+    'owner_id': fields.String(required=False, description='ID of the owner (automatically set to current user)'),
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
@@ -54,23 +54,15 @@ class PlaceList(Resource):
         Returns:
             tuple: JSON response with new place or error, and HTTP status code.
         """
-
         current_user_id = get_jwt_identity()
         current_user = facade.get_user(current_user_id)
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
 
         if not current_user:
             return {"error": "Unauthorized"}, 403
 
         data = api.payload
-
-        # Only admins can choose the owner_id
-        if is_admin:
-            if 'owner_id' not in data:
-                return {"error": "owner_id is required for admins"}, 400
-        else:
-            data["owner_id"] = current_user_id
+        # Set the current user as owner
+        data["owner_id"] = current_user_id
 
         try:
             place = facade.create_place(data)
@@ -126,6 +118,7 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """
         Update an existing place.
+        Only the owner can update their place.
 
         Args:
             place_id (str): The ID of the place to update.
@@ -135,20 +128,21 @@ class PlaceResource(Resource):
         """
         data = api.payload
         current_user_id = get_jwt_identity()
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
 
         if not current_user_id:
             return {"error": "Unauthorized"}, 403
-        if not is_admin and 'owner_id' in data:
+
+        # Users cannot change owner_id
+        if 'owner_id' in data:
             return {"error": "You cannot modify the owner of a place"}, 400
 
         place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
 
-        # Check access: owner or admin
-        if not is_admin and place.owner_id != current_user_id:
-            return {"error": "Unauthorized action"}, 403
+        # Check access: only owner can update
+        if place.owner_id != current_user_id:
+            return {"error": "You can only update your own places"}, 403
+
         update_place = facade.update_place(place_id, data)
         return update_place.to_dict(), 200
