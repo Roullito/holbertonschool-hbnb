@@ -33,17 +33,10 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
-    @api.response(403, 'Admin access required')
-    @api.doc(security='Bearer')
-    @jwt_required()
     def post(self):
         """
-        Register a new amenity (Admin only)
+        Register a new amenity
         """
-        claims = get_jwt()
-        if not claims.get('is_admin', False):
-            return {"error": "Admin access required"}, 403
-
         amenity_data = api.payload
         try:
             new_amenity = facade.create_amenity(amenity_data)
@@ -86,17 +79,10 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
-    @api.response(403, 'Admin access required')
-    @api.doc(security='Bearer')
-    @jwt_required()
     def put(self, amenity_id):
         """
-        Update an amenity (Admin only)
+        Update an amenity
         """
-        claims = get_jwt()
-        if not claims.get('is_admin', False):
-            return {"error": "Admin access required"}, 403
-
         amenity_data = api.payload
         updated_amenity = facade.update_amenity(amenity_id, amenity_data)
 
