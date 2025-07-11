@@ -142,17 +142,17 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """
         Update an existing review by its ID.
+        Only the author can update their review.
         """
         current_user_id = get_jwt_identity()
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not is_admin and review.user_id != current_user_id:
-            return {"error": "Unauthorized"}, 403
+        # Only the author can update their review
+        if review.user_id != current_user_id:
+            return {"error": "You can only update your own reviews"}, 403
 
         try:
             review_data = api.payload
@@ -184,18 +184,18 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """
-            Delete a review by its ID.
+        Delete a review by its ID.
+        Only the author can delete their review.
         """
         current_user_id = get_jwt_identity()
-        claims = get_jwt()
-        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not is_admin and review.user_id != current_user_id:
-            return {"error": "Unauthorized"}, 403
+        # Only the author can delete their review
+        if review.user_id != current_user_id:
+            return {"error": "You can only delete your own reviews"}, 403
 
         try:
             success = facade.delete_review(review_id)

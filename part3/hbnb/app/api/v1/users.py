@@ -18,7 +18,8 @@ user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
-    'password': fields.String(required=True, description='Password of the user (min 8 chars)')
+    'password': fields.String(required=True, description='Password of the user (min 8 chars)'),
+    'is_admin': fields.Boolean(required=False, description='Admin status (admin auth required if true)')
 })
 
 
@@ -35,24 +36,27 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
-    @api.response(403, 'Admin access required')
+    @api.response(403, 'Admin access required to create admin users')
     @api.doc(security='Bearer')
-    @jwt_required()
+    @jwt_required(optional=True)
     def post(self):
         """
         Register a new user.
-        Only admins can create users through this endpoint.
+        - Anyone can create a regular user (no auth required)
+        - Only admins can create admin users (auth required if is_admin=true)
 
         Returns:
             tuple: The new user's data and HTTP 201 on success,
                    or an error message and HTTP 400/403 on failure.
         """
-        # Check if current user is admin
-        claims = get_jwt()
-        if not claims.get('is_admin', False):
-            return {'error': 'Admin privileges required'}, 403
-
         user_data = api.payload
+
+        # Check if trying to create an admin user
+        if user_data.get('is_admin', False):
+            # Auth required for admin creation
+            claims = get_jwt()
+            if not claims or not claims.get('is_admin', False):
+                return {'error': 'Admin privileges required to create admin users'}, 403
 
         # Check if email is already registered
         existing_user = facade.get_user_by_email(user_data['email'])
@@ -72,13 +76,21 @@ class UserList(Resource):
     # GET /api/v1/users/ : Return all users
     @api.marshal_list_with(user_model)
     @api.response(200, 'List of users')
+    @api.response(403, 'Admin access required')
+    @api.doc(security='Bearer')
+    @jwt_required()
     def get(self):
         """
-        Retrieve all registered users.
+        Retrieve all registered users (Admin only).
 
         Returns:
             tuple: List of user data dictionaries and HTTP 200.
         """
+        # Check if current user is admin
+        claims = get_jwt()
+        if not claims.get('is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
+
         users = facade.get_all_users()
         return [u.to_dict() for u in users], 200
 
@@ -120,8 +132,8 @@ class UserResource(Resource):
     def put(self, user_id):
         """
         Update user information.
-        Admins can update any user including email/password.
-        Regular users can only update their own profile (excluding email/password).
+        - Users can update their own profile (except is_admin field)
+        - Admins can update any user including is_admin field
         """
         current_user_id = get_jwt_identity()
         claims = get_jwt()
@@ -132,18 +144,18 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
 
-        # Authorization check
+        # Authorization check: user can edit themselves, admin can edit anyone
         if not is_admin and user_id != current_user_id:
-            return {"error": "Unauthorized action"}, 403
+            return {"error": "You can only modify your own profile"}, 403
 
         user_data = api.payload
 
-        # Admin can modify email and password, regular users cannot
-        if not is_admin and ('email' in user_data or 'password' in user_data):
-            return {"error": "You cannot modify email or password."}, 400
+        # Only admins can modify is_admin field
+        if not is_admin and 'is_admin' in user_data:
+            return {"error": "Only admins can modify admin status"}, 403
 
-        # If admin is changing email, check for uniqueness
-        if is_admin and 'email' in user_data:
+        # If changing email, check for uniqueness
+        if 'email' in user_data:
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user and existing_user.id != user_id:
                 return {'error': 'Email already in use'}, 400

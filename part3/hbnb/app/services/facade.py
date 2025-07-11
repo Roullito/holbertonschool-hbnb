@@ -186,7 +186,7 @@ class HBnBFacade:
         Raises:
             ValueError: If specified owner is not found.
         """
-        owner_id = place_data.pop('owner')
+        owner_id = place_data.pop('owner_id')
         owner = self.get_user(owner_id)
         if not owner:
             raise ValueError("Owner not found")
