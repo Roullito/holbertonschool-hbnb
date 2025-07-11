@@ -19,6 +19,7 @@ __pycache__/
 *.log
 *.out
 *.tmp
+Start_venv
 
 # Jetons ou fichiers sensibles
 *.token
