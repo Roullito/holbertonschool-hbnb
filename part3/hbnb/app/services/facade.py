@@ -175,10 +175,10 @@ class HBnBFacade:
 
     def create_place(self, place_data):
         """
-        Create and store a new Place linked to an existing User.
+        Create a new place.
 
         Args:
-            place_data (dict): Attributes, including 'owner' user ID.
+            place_data (dict): Dictionary with place details including owner_id.
 
         Returns:
             Place: The newly created Place.
@@ -187,10 +187,22 @@ class HBnBFacade:
             ValueError: If specified owner is not found.
         """
         owner_id = place_data.pop('owner_id')
+        amenities_data = place_data.pop('amenities', [])
+
         owner = self.get_user(owner_id)
         if not owner:
             raise ValueError("Owner not found")
+
         place = Place(owner=owner, **place_data)
+
+        if amenities_data:
+            for amenity_name in amenities_data:
+                amenity = self.amenity_repo.get_by_attribute('name', amenity_name)
+                if not amenity:
+                    amenity = Amenity(name=amenity_name)
+                    self.amenity_repo.add(amenity)
+                place.add_amenity(amenity)
+
         self.place_repo.add(place)
         return place
 
