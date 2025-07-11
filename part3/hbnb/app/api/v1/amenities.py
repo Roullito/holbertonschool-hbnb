@@ -22,15 +22,21 @@ Raises:
 
 api = Namespace('amenities', description='Amenity operations')
 
-# Define the amenity model for input validation and documentation
-amenity_model = api.model('Amenity', {
+# Define the amenity input/output models for validation and documentation
+amenity_input_model = api.model('AmenityInput', {
     'name': fields.String(required=True, description='Name of the amenity')
+})
+
+amenity_output_model = api.model('Amenity', {
+    'id': fields.String(description='Amenity ID'),
+    'name': fields.String(description='Name of the amenity')
 })
 
 
 @api.route('/')
 class AmenityList(Resource):
-    @api.expect(amenity_model)
+    @api.expect(amenity_input_model)
+    @api.marshal_with(amenity_output_model, code=201)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
@@ -44,6 +50,7 @@ class AmenityList(Resource):
         except (ValueError, TypeError) as e:
             return {"error": str(e)}, 400
 
+    @api.marshal_list_with(amenity_output_model)
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
         """
@@ -58,6 +65,7 @@ class AmenityList(Resource):
 
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
+    @api.marshal_with(amenity_output_model)
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
@@ -75,7 +83,8 @@ class AmenityResource(Resource):
             return {"error": "Amenity not found"}, 404
         return get_amenity.to_dict(), 200
 
-    @api.expect(amenity_model)
+    @api.expect(amenity_input_model)
+    @api.marshal_with(amenity_output_model)
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')

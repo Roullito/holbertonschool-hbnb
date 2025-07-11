@@ -34,7 +34,6 @@ class Place(BaseModel):
     """
     __tablename__ = 'place'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     title = db.Column(db.String(126), nullable=False)
     description = db.Column(db.String(256), nullable=False, unique=True)
     price = db.Column(db.Float, nullable=False)
@@ -99,5 +98,15 @@ class Place(BaseModel):
         if not isinstance(owner, User):
             raise TypeError("Owner must be an instance of User")
         self.owner = owner
+
+    def add_amenity(self, amenity):
+        """Add an amenity to this place."""
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
+
+    def remove_amenity(self, amenity):
+        """Remove an amenity from this place."""
+        if amenity in self.amenities:
+            self.amenities.remove(amenity)
 
 
