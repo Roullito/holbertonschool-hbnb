@@ -64,14 +64,15 @@ class BaseModel(db.Model):
             dict: A mapping of attribute names to their JSON-serializable values.
         """
         result = {}
-        for key, value in self.__dict__.items():
+
+        # Get all column attributes from SQLAlchemy
+        for column in self.__table__.columns:
+            key = column.name
+            value = getattr(self, key)
+
             if isinstance(value, datetime):
                 result[key] = value.isoformat()
-            elif hasattr(value, 'to_dict'):
-                result[key] = value.to_dict()
-            elif (isinstance(value, list)
-                  and all(hasattr(item, 'to_dict') for item in value)):
-                result[key] = [item.to_dict() for item in value]
             else:
                 result[key] = value
+
         return result
