@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS place_amenity (
     FOREIGN KEY (amenity_id) REFERENCES amenities(id) ON DELETE CASCADE
 );
 
--- Insert admin user
-INSERT INTO users (
+-- Insert admin user (ignore si déjà présent)
+INSERT OR IGNORE INTO users (
     id, email, first_name, last_name, password, is_admin
 ) VALUES (
     '36c9050e-ddd3-4c3b-9731-9f487208bbc1',
@@ -71,8 +71,9 @@ INSERT INTO users (
     TRUE
 );
 
--- Insert initial amenities
-INSERT INTO amenities (id, name) VALUES
+-- Insert initial amenities (ignore si déjà présents)
+INSERT OR IGNORE INTO amenities (id, name) VALUES
     ('26de0779-5dfb-4f77-916d-ed6728e88edd', 'WiFi'),
     ('3493beb7-a2aa-4dd2-95e2-be9b1cca3b06', 'Swimming Pool'),
     ('3b23dec0-54f2-4a9f-bfb0-49a215961d72', 'Air Conditioning');
+
