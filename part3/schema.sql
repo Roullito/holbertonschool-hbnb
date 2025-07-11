@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 -- Table users
 CREATE TABLE IF NOT EXISTS users (
     id CHAR(36) PRIMARY KEY NOT NULL,
