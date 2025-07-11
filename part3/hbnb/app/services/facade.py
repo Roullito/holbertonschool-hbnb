@@ -341,3 +341,11 @@ class HBnBFacade:
             return False
         self.review_repo.delete(review_id)
         return True
+
+    def get_review_by_user_and_place(self, user_id, place_id):
+        """Get review by user and place to check for duplicates."""
+        reviews = self.get_all_reviews()
+        for review in reviews:
+            if review.user_id == user_id and review.place_id == place_id:
+                return review
+        return None

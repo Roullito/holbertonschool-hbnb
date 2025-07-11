@@ -21,7 +21,7 @@ class Amenity(BaseModel):
     Attributes:
         name (str): The name of the amenity, e.g. "WiFi" or "Pool".
     """
-    __tablename__ = 'amenity'
+    __tablename__ = 'amenities'
 
     name = db.Column(db.String(50), nullable=False)
 
@@ -46,3 +46,17 @@ class Amenity(BaseModel):
             raise ValueError(
                 "Amenity name must be at most 50 characters long.")
         self.name = name
+
+    def to_dict(self):
+        """
+        Serialize the amenity to a dictionary.
+
+        Returns:
+            dict: Mapping of Amenity fields (id, name, created_at, updated_at).
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
