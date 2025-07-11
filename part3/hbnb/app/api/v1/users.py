@@ -13,14 +13,20 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 # Define the users namespace for the API
 api = Namespace('users', description='User operations')
 
-# Define the user input/output schema for Swagger and validation
-user_model = api.model('User', {
-    'id': fields.String(description='User ID'),
+user_input_model = api.model('UserInput', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
     'password': fields.String(required=True, description='Password of the user (min 8 chars)'),
     'is_admin': fields.Boolean(required=False, description='Admin status (admin auth required if true)')
+})
+
+user_output_model = api.model('User', {
+    'id': fields.String(description='User ID'),
+    'first_name': fields.String(description='First name of the user'),
+    'last_name': fields.String(description='Last name of the user'),
+    'email': fields.String(description='Email of the user'),
+    'is_admin': fields.Boolean(description='Admin status')
 })
 
 
@@ -33,7 +39,8 @@ class UserList(Resource):
     GET:  Retrieve a list of all users.
     """
     # POST /api/v1/users/ : Create a new user
-    @api.expect(user_model, validate=True)
+    @api.expect(user_input_model, validate=True)
+    @api.marshal_with(user_output_model, code=201)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
@@ -75,7 +82,7 @@ class UserList(Resource):
         return new_user.to_dict(), 201
 
     # GET /api/v1/users/ : Return all users
-    @api.marshal_list_with(user_model)
+    @api.marshal_list_with(user_output_model)
     @api.response(200, 'List of users')
     @api.response(403, 'Admin access required')
     @api.doc(security='Bearer')
@@ -105,6 +112,7 @@ class UserResource(Resource):
     PUT: Update an existing user by ID.
     """
     # GET /api/v1/users/<user_id> : Return a user by ID
+    @api.marshal_with(user_output_model)
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
@@ -124,7 +132,8 @@ class UserResource(Resource):
         return user.to_dict()
 
     # PUT /api/v1/users/<user_id> : Update a user by ID
-    @api.expect(user_model, validate=True)
+    @api.expect(user_input_model, validate=True)
+    @api.marshal_with(user_output_model)
     @api.response(200, 'User updated successfully')
     @api.response(404, 'User not found')
     @api.response(403, 'Unauthorized action')

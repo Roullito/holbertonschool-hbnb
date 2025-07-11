@@ -23,7 +23,6 @@ class Amenity(BaseModel):
     """
     __tablename__ = 'amenity'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     name = db.Column(db.String(50), nullable=False)
 
     def __init__(self, name):
