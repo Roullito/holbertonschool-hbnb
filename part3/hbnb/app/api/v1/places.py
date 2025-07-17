@@ -132,13 +132,12 @@ class PlaceResource(Resource):
         if not current_user_id:
             return {"error": "Unauthorized"}, 403
 
-        # Users cannot change owner_id
-        if 'owner_id' in data:
-            return {"error": "You cannot modify the owner of a place"}, 400
-
         place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
+
+        if 'owner_id' in data and data['owner_id'] != place.owner_id:
+            return {"error": "You cannot modify the owner of a place"}, 400
 
         # Check access: only owner can update
         if place.owner_id != current_user_id:
