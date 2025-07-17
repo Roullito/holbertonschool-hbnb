@@ -241,9 +241,28 @@ class HBnBFacade:
         place = self.place_repo.get(place_id)
         if not place:
             return None
+
+        if 'amenities' in place_data:
+            amenities_data = place_data.pop('amenities')
+
+            place.amenities.clear()
+
+            for amenity_identifier in amenities_data:
+                amenity = self.amenity_repo.get(amenity_identifier)
+
+                if not amenity:
+                    amenity = self.amenity_repo.get_by_attribute('name', amenity_identifier)
+
+                if not amenity:
+                    amenity = Amenity(name=amenity_identifier)
+                    self.amenity_repo.add(amenity)
+
+                place.amenities.append(amenity)
+
         for key, value in place_data.items():
-            if hasattr(place, key):
+            if hasattr(place, key) and key != 'amenities':
                 setattr(place, key, value)
+
         db.session.commit()
         return place
 
