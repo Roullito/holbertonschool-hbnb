@@ -1,78 +1,177 @@
+:root {
+  --airbnb-primary: #FF5A5F;
+  --airbnb-gray: #F7F7F7;
+  --airbnb-dark: #222;
+}
+
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
+
 body {
-    background-color: #F7F7F7;
-    color: #484848;
+  background: var(--airbnb-gray);
+  color: var(--airbnb-dark);
+  min-height: 100vh;
 }
+
 header {
-    background-color: #FF5A5F;
-    color: #fff;
-    padding: 1rem 2rem;
+  background: var(--airbnb-primary);
+  color: #fff;
+  padding: 1.2rem 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+
 .logo {
-    height: 44px;
+  height: 44px;
 }
+
 nav a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 1rem;
+  color: #fff;
+  text-decoration: none;
+  margin-left: 1.2rem;
+  font-size: 1.1em;
+  font-weight: 500;
+  letter-spacing: .5px;
+  transition: opacity 0.15s;
 }
-.login-button {
-    background: none;
-    color: #fff;
-    border: none;
-    font-weight: bold;
-    font-size: 1.07em;
-    cursor: pointer;
-    padding: 0;
+nav a:hover {
+  opacity: 0.8;
 }
+
 main {
-    padding: 2rem 1rem;
+  padding: 2rem 1rem 0 1rem;
+  min-height: 60vh;
 }
+
 h1, h2 {
-    margin-bottom: 2rem;
-    text-align: center;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
+  text-align: center;
+  letter-spacing: .2px;
 }
-#filter {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 2rem;
+
+h2 {
+  margin-top: 2.2rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.35rem;
+  text-align: center;
 }
+
+.reviews-title {
+  text-align: center;
+  margin: 2rem 0 1rem 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
 .place-card, .review-card {
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: #fff;
-    display: inline-block;
-    min-width: 260px;
-    max-width: 300px;
-    vertical-align: top;
-    text-align: center;
+  margin: 20px auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  min-width: 220px;
+  max-width: 950px;
+  width: 95%;
+  box-shadow: 0 2px 16px #0001;
+  text-align: center;
 }
+.place-card p, .review-card p {
+  font-size: 1.09rem;
+  margin: 0.25em 0;
+}
+
+.review-card {
+  text-align: left;
+}
+
+#reviews-list {
+  margin-bottom: 2.3rem;
+  text-align: center;
+}
+
+
 .details-button {
-    background: #FF5A5F;
-    color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 10px 26px;
-    margin-top: 15px;
-    font-weight: bold;
-    font-size: 1em;
-    cursor: pointer;
+  background: var(--airbnb-primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 32px;
+  margin-top: 15px;
+  font-weight: 600;
+  font-size: 1em;
+  letter-spacing: 0.7px;
+  cursor: pointer;
 }
+
+.add-review-section {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px #0001;
+  max-width: 900px;
+  margin: 2.5rem auto 1.8rem auto;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border: 1px solid #ddd;
+  min-width: 220px;
+  width: 94%;
+}
+
+.add-review-section h2 {
+  text-align: left;
+  margin-bottom: 1.2rem;
+  font-size: 1.19rem;
+  color: var(--airbnb-primary);
+}
+
+.review-form label {
+  display: block;
+  margin: 0.8em 0 0.33em 0;
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+
+.review-form textarea,
+.review-form select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1.2px solid #e0e0e0;
+  border-radius: 7px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  background: #fafbfc;
+  resize: vertical;
+}
+.review-form textarea:focus, .review-form select:focus {
+  border-color: var(--airbnb-primary);
+  outline: none;
+}
+
+.submit-review-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px 0;
+  background: var(--airbnb-primary);
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.12rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #ffb40014;
+}
+
 footer {
-    background: #FF5A5F;
-    color: #fff;
-    padding: 1rem 0;
-    text-align: center;
-    font-size: 0.98em;
-    border-top: none;
-    margin-top: 40px;
+  background: var(--airbnb-primary);
+  color: #fff;
+  padding: 1.05rem 0;
+  text-align: center;
+  font-size: 1em;
+  margin-top: 38px;
+  box-shadow: 0 -1px 7px #0001;
 }

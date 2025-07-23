@@ -12,7 +12,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
     bcrypt.init_app(app)
     jwt.init_app(app)

@@ -12,24 +12,27 @@
         <img src="images/logo.png" alt="Logo" class="logo">
         <nav>
             <a href="index.html">Home</a>
-            <a href="login.html" class="login-button">Login</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
     <main>
         <section id="filter">
             <label for="price-filter">Max Price:</label>
             <select id="price-filter">
-                <!-- Options will be populated dynamically -->
+                <option value="All">All</option>
+                <option value="10">10 €</option>
+                <option value="50">50 €</option>
+                <option value="100">100 €</option>
+                <option value="150">150 €</option>
+                <option value="200">200 €</option>
+                <option value="250">250 €</option>
+                <option value="300">300 €</option>
+                <option value="350">350 €</option>
+                <option value="400">400 €</option>
             </select>
         </section>
         <section id="places-list">
-            <!-- List of places will be populated dynamically -->
         </section>
-        <div class="place-card">
-            <h3>Cosy Appart Paris</h3>
-            <p>Price per night: <b>€100</b></p>
-            <button class="details-button">View Details</button>
-        </div>
     </main>
     <script src="scripts.js"></script>
     <footer>

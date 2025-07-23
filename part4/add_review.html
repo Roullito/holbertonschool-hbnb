@@ -12,21 +12,31 @@
         <img src="images/logo.png" alt="Logo" class="logo">
         <nav>
             <a href="index.html">Home</a>
-            <a href="login.html" class="login-button">Login</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
     <main>
-        <!-- Add something to idfentify the place you're reviewing -->
-        <form id="review-form">
+        <section id="add-review" class="add-review-section">
             <h2>Add a Review</h2>
-            <label for="review">Your Review:</label>
-            <textarea id="review" name="review" required></textarea>
-            <label for="rating">Rating:</label>
-            <select id="rating" name="rating" required>
-                <!-- Options for rating -->
-            </select>
-            <button type="submit">Submit Review</button>
-        </form>
+            <div id="place-title"></div>
+            <form id="review-form" class="review-form">
+                <input type="hidden" id="place-id" name="place-id" value="">
+                <label for="review-text"><b>Your Review:</b></label>
+                <textarea id="review-text" name="review-text" required rows="3" placeholder="Share your experience..."></textarea>
+
+                <label for="review-rating"><b>Rating:</b></label>
+                <select id="review-rating" name="review-rating" required>
+                    <option value="" disabled selected>Select a rating</option>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+
+                <button type="submit" class="submit-review-btn">Submit Review</button>
+            </form>
+        </section>
     </main>
     <script src="scripts.js"></script>
     <footer>

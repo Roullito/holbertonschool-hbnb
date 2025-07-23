@@ -12,23 +12,32 @@
         <img src="images/logo.png" alt="Logo" class="logo">
         <nav>
             <a href="index.html">Home</a>
-            <a href="login.html" class="login-button">Login</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
     <main>
         <section id="place-details">
-            <!-- Place details will be populated dynamically -->
         </section>
         <section id="reviews">
-            <!-- Reviews will be populated dynamically -->
+            <div id="reviews-list">
+            </div>
         </section>
-        <section id="add-review">
+        <section id="add-review" class="add-review-section">
             <h2>Add a Review</h2>
-            <form id="review-form">
-                <label for="review-text">Review:</label>
-                <textarea id="review-text" name="review-text" required></textarea>
+            <form id="review-form" class="review-form">
+                <label for="review-text"><b>Your Review:</b></label>
+                <textarea id="review-text" name="review-text" required rows="3" placeholder="Share your experience..."></textarea>
 
-                <button type="submit">Submit</button>
+                <label for="review-rating"><b>Rating:</b></label>
+                <select id="review-rating" name="review-rating" required>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+
+                <button type="submit" class="submit-review-btn">Submit Review</button>
             </form>
         </section>
     </main>
