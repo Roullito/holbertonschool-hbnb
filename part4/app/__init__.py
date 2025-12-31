@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from app.extensions import db
 from flask_cors import CORS
+from datetime import timedelta
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
@@ -11,6 +12,7 @@ jwt = JWTManager()
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=6)
 
     CORS(app, supports_credentials=True)
 

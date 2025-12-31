@@ -27,7 +27,6 @@ api = Namespace('reviews', description='Review operations')
 review_model = api.model('Review', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
-    'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
@@ -51,6 +50,10 @@ class ReviewList(Resource):
         current_user_id = get_jwt_identity()
         try:
             review_data = api.payload
+
+            if not review_data:
+                return {"error": "No data provided"}, 400
+
             place = facade.get_place(review_data["place_id"])
             if place.owner_id == current_user_id:
                 return {"error": "You cannot review your own place."}, 400
@@ -72,6 +75,7 @@ class ReviewList(Resource):
                 'text': new_review.text,
                 'rating': new_review.rating,
                 'user_id': new_review.user.id,
+                'user_name': f"{new_review.user.first_name} {new_review.user.last_name}",
                 'place_id': new_review.place.id,
                 'created_at': new_review.created_at.isoformat(),
                 'updated_at': new_review.updated_at.isoformat()
@@ -94,6 +98,7 @@ class ReviewList(Resource):
                     'text': review.text,
                     'rating': review.rating,
                     'user_id': review.user_id,
+                    'user_name': f"{review.user.first_name} {review.user.last_name}",
                     'place_id': review.place_id,
                     'created_at': review.created_at.isoformat(),
                     'updated_at': review.updated_at.isoformat()
@@ -127,6 +132,7 @@ class ReviewResource(Resource):
                 'text': review.text,
                 'rating': review.rating,
                 'user_id': review.user_id,
+                'user_name': f"{review.user.first_name} {review.user.last_name}",
                 'place_id': review.place_id,
                 'created_at': review.created_at.isoformat(),
                 'updated_at': review.updated_at.isoformat()
@@ -170,6 +176,7 @@ class ReviewResource(Resource):
                 'text': updated_review.text,
                 'rating': updated_review.rating,
                 'user_id': updated_review.user_id,
+                'user_name': f"{updated_review.user.first_name} {updated_review.user.last_name}",
                 'place_id': updated_review.place_id,
                 'created_at': updated_review.created_at.isoformat(),
                 'updated_at': updated_review.updated_at.isoformat()
@@ -234,6 +241,7 @@ class PlaceReviewList(Resource):
                     'text': review.text,
                     'rating': review.rating,
                     'user_id': review.user_id,
+                    'user_name': f"{review.user.first_name} {review.user.last_name}",
                     'place_id': review.place_id,
                     'created_at': review.created_at.isoformat(),
                     'updated_at': review.updated_at.isoformat()
