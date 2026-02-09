@@ -5,7 +5,7 @@
 Ce diagramme représente le **Modèle Logique de Données (MLD)** / **Entity-Relationship Diagram (ERD)** du projet HBnB avec toutes les tables, clés primaires/étrangères, cardinalités et contraintes.
 
 ```mermaid
-erDiagram
+eerDiagram
     users ||--o{ places : "owns (1..N)"
     users ||--o{ reviews : "writes (1..N)"
     places ||--o{ reviews : "has (1..N)"
@@ -29,7 +29,7 @@ erDiagram
         decimal(10_2) price "NOT NULL, CHECK >= 0"
         float latitude "NOT NULL"
         float longitude "NOT NULL"
-        char(36) owner_id FK "Foreign Key → users"
+        char(36) owner_id FK "Foreign Key to users"
         datetime created_at
         datetime updated_at
     }
@@ -38,8 +38,8 @@ erDiagram
         char(36) id PK "Primary Key"
         text text "NOT NULL"
         int rating "CHECK 1-5"
-        char(36) user_id FK "Foreign Key → users"
-        char(36) place_id FK "Foreign Key → places"
+        char(36) user_id FK "Foreign Key to users"
+        char(36) place_id FK "Foreign Key to places"
         datetime created_at
         datetime updated_at
     }
@@ -52,8 +52,8 @@ erDiagram
     }
 
     place_amenity {
-        char(36) place_id PK_FK "Composite PK, FK → places"
-        char(36) amenity_id PK_FK "Composite PK, FK → amenities"
+        char(36) place_id FK "FK to places, part of PK"
+        char(36) amenity_id FK "FK to amenities, part of PK"
         datetime created_at
         datetime updated_at
     }
