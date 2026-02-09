@@ -6,57 +6,62 @@ Ce diagramme représente le **Modèle Logique de Données (MLD)** / **Entity-Rel
 
 ```mermaid
 erDiagram
-    users ||--o{ places : "owns (1..N)"
-    users ||--o{ reviews : "writes (1..N)"
-    places ||--o{ reviews : "has (1..N)"
-    places }o--o{ amenities : "has (N..N)"
+    users  ||--o{ places        : "owns (1..N)"
+    users  ||--o{ reviews       : "writes (1..N)"
+    places ||--o{ reviews       : "has (1..N)"
+    places ||--o{ place_amenity : "links"
+    amenities ||--o{ place_amenity : "links"
 
     users {
-        char(36) id PK "Primary Key"
+        char(36) id PK
         varchar(255) first_name "NOT NULL"
-        varchar(255) last_name "NOT NULL"
-        varchar(255) email UK "UNIQUE, NOT NULL"
-        varchar(255) password "NOT NULL"
+        varchar(255) last_name  "NOT NULL"
+        varchar(255) email UK   "UNIQUE, NOT NULL"
+        varchar(255) password_hash "NOT NULL"
         boolean is_admin "DEFAULT FALSE"
         datetime created_at
         datetime updated_at
     }
 
     places {
-        char(36) id PK "Primary Key"
+        char(36) id PK
         varchar(255) title "NOT NULL"
         text description
-        decimal(10_2) price "NOT NULL, CHECK >= 0"
+        decimal(10,2) price "NOT NULL, CHECK price >= 0"
         float latitude "NOT NULL"
         float longitude "NOT NULL"
-        char(36) owner_id FK "Foreign Key to users"
+        char(36) owner_id FK "NOT NULL, FK -> users.id"
         datetime created_at
         datetime updated_at
     }
 
     reviews {
-        char(36) id PK "Primary Key"
-        text text "NOT NULL"
-        int rating "CHECK 1-5"
-        char(36) user_id FK "Foreign Key to users"
-        char(36) place_id FK "Foreign Key to places"
+        char(36) id PK
+        text comment "NOT NULL"
+        int rating "NOT NULL, CHECK rating BETWEEN 1 AND 5"
+        char(36) user_id FK "NOT NULL, FK -> users.id"
+        char(36) place_id FK "NOT NULL, FK -> places.id"
         datetime created_at
         datetime updated_at
+        %% Optionnel mais très propre :
+        %% UNIQUE(user_id, place_id)
     }
 
     amenities {
-        char(36) id PK "Primary Key"
+        char(36) id PK
         varchar(255) name UK "UNIQUE, NOT NULL"
         datetime created_at
         datetime updated_at
     }
 
     place_amenity {
-        char(36) place_id FK "FK to places, part of PK"
-        char(36) amenity_id FK "FK to amenities, part of PK"
+        char(36) place_id FK "NOT NULL, FK -> places.id (PK part)"
+        char(36) amenity_id FK "NOT NULL, FK -> amenities.id (PK part)"
+        %% PK(place_id, amenity_id)
         datetime created_at
         datetime updated_at
     }
+
 ```
 
 ---
