@@ -5,7 +5,7 @@
 Ce diagramme représente le **Modèle Logique de Données (MLD)** / **Entity-Relationship Diagram (ERD)** du projet HBnB avec toutes les tables, clés primaires/étrangères, cardinalités et contraintes.
 
 ```mermaid
-eerDiagram
+erDiagram
     users ||--o{ places : "owns (1..N)"
     users ||--o{ reviews : "writes (1..N)"
     places ||--o{ reviews : "has (1..N)"
