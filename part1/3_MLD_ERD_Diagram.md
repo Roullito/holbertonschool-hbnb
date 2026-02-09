@@ -27,7 +27,7 @@ erDiagram
         char(36) id PK
         varchar(255) title "NOT NULL"
         text description
-        decimal(10,2) price "NOT NULL, CHECK price >= 0"
+        decimal price "DECIMAL(10,2), NOT NULL, CHECK price >= 0"
         float latitude "NOT NULL"
         float longitude "NOT NULL"
         char(36) owner_id FK "NOT NULL, FK -> users.id"
@@ -43,8 +43,6 @@ erDiagram
         char(36) place_id FK "NOT NULL, FK -> places.id"
         datetime created_at
         datetime updated_at
-        %% Optionnel mais très propre :
-        %% UNIQUE(user_id, place_id)
     }
 
     amenities {
@@ -57,7 +55,6 @@ erDiagram
     place_amenity {
         char(36) place_id FK "NOT NULL, FK -> places.id (PK part)"
         char(36) amenity_id FK "NOT NULL, FK -> amenities.id (PK part)"
-        %% PK(place_id, amenity_id)
         datetime created_at
         datetime updated_at
     }
