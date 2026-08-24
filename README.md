@@ -1,133 +1,58 @@
-<div align="center">
+# HBnB — Airbnb-Style REST API
 
-# 🏠 HBnB - UML Documentation
+Team project (3 developers) building an Airbnb-style backend across four phases: UML technical design (`part1`), an in-memory Business Logic Layer and Flask-RESTx API (`part2`), a full REST API with JWT authentication and SQLAlchemy/database persistence (`part3`), and a simple web frontend consuming the API (`part4`). `part3` is the most complete and production-relevant version of the API.
 
-**Simplified AirBnB-like Application Design**
-Team: Alexis Cornillon, Jules Moleins
-Project by: Javier Valenzani
+## Overview
 
-</div>
+HBnB models the core of an Airbnb-style platform: users, place listings, amenities and reviews, exposed through a documented REST API with authentication and role-based authorization.
 
----
+## Features
 
-## 📚 Project Overview
+- User, Place, Amenity and Review resources with full CRUD operations
+- Password hashing (bcrypt) — passwords are never stored in plaintext
+- JWT-based authentication (Flask-JWT-Extended)
+- Authorization checks: a user can only modify resources they own, unless they hold admin rights
+- Facade pattern decoupling the API layer from business logic
+- Repository pattern for persistence, migrated from in-memory storage to SQLAlchemy with a relational schema (`schema.sql`)
+- Auto-generated Swagger/OpenAPI documentation (Flask-RESTx)
 
-This project is the **first phase** of the HBnB Evolution application. The goal is to produce a **complete UML-based technical documentation** that will serve as the foundation for the system’s development.
+## Tech Stack
 
-We are designing an **AirBnB-like system** with support for user management, place listings, amenities, and reviews.
+Python 3, Flask, Flask-RESTx, Flask-JWT-Extended, Flask-Bcrypt, SQLAlchemy, Flask-SQLAlchemy, SQL
 
----
+## Architecture
 
-## 🧱 Application Architecture
+Three-layer architecture, documented with UML diagrams in `part1`: a Presentation layer (API endpoints), a Business Logic layer (models and validation rules), and a Persistence layer (repository pattern, backed by SQLAlchemy from `part3` onward). A Facade layer sits between the API and business logic to keep the two decoupled.
 
-The HBnB system follows a **three-layer architecture**:
+## Security Considerations
 
-- **Presentation Layer**: Handles user interaction through APIs and services.
-- **Business Logic Layer**: Contains core models and domain logic.
-- **Persistence Layer**: Manages data storage and retrieval from the database.
+- Passwords are hashed with bcrypt before storage, never kept in plaintext
+- Authentication is handled via signed JWTs, with dedicated protected/admin-only endpoints (`app/api/v1/auth.py`, `app/api/v1/protected.py` in `part3`)
+- Authorization is enforced per-resource: ownership checks (e.g. `owner_id` on places) gate updates and deletes unless the requester is an admin
+- Data-integrity rules are enforced at the database schema level in addition to application-level validation, as a defense-in-depth measure
 
-All data is persisted in a database (to be specified in Part 3).
+## Installation
 
----
+From `part3`, the most complete version:
 
-## 🧩 Entities & Business Rules
+```
+cd part3
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python run.py
+```
 
-### 👤 User
-- Attributes: `first_name`, `last_name`, `email`, `password`, `is_admin`
-- Can: Register, update, delete
-- Identified by unique ID and tracked with creation/update timestamps
+Swagger UI is available at `http://localhost:5000/api/v1/`.
 
-### 🏠 Place
-- Attributes: `title`, `description`, `price`, `latitude`, `longitude`
-- Linked to a user (owner)
-- Can: Create, update, delete, list
-- Can be associated with multiple amenities
+## Usage
 
-### 🧼 Amenity
-- Attributes: `name`, `description`
-- Can: Create, update, delete, list
+Use the Swagger UI (or a client such as curl/Postman) to register a user, authenticate to obtain a JWT, then pass it as a Bearer token to create and manage places, amenities and reviews.
 
-### 📝 Review
-- Attributes: `rating`, `comment`
-- Linked to a specific user and place
-- Can: Create, update, delete, list by place
+## What I Learned
 
-All entities are timestamped and uniquely identified.
+Building the authentication and access-control logic myself — deciding where to enforce ownership checks, when to require admin rights, and how to combine framework-level validation with database constraints — is what makes it easier to recognize and test for the same bug classes (broken authentication, IDOR, privilege escalation) in applications I don't control.
 
----
+## Authors
 
-## 🗂️ Tasks
-
-### 1. 📦 High-Level Package Diagram
-- Diagram showing the 3-layer architecture
-- Communication via **Facade Pattern**
-
-### 2. 📐 Detailed Class Diagram (Business Logic Layer)
-- Covers: `User`, `Place`, `Review`, `Amenity`
-- Includes:
-  - Attributes
-  - Methods
-  - Relationships (1:many, many:many, etc.)
-
-### 3. 🔄 Sequence Diagrams for API Calls
-- At least 4 use cases, such as:
-  - User Registration
-  - Place Creation
-  - Review Submission
-  - Fetching Place List
-
-### 4. 📄 Documentation Compilation
-- All diagrams + explanations gathered into a structured document
-- UML notation must be consistent and complete
-
----
-
-## 🧭 Constraints
-
-- Use standard **UML notation**
-- Ensure clarity and accuracy across all diagrams
-- Business rules **must be reflected** in the class and sequence diagrams
-- Diagrams must be detailed enough to guide implementation
-
----
-
-## 🛠️ Resources & Tools
-
-### UML Concepts
-- [Intro to UML (Holberton)](https://intranet.hbtn.io/concepts/130)
-
-### 📦 Package Diagrams
-- [Package Diagram Overview](https://www.uml-diagrams.org/package-diagrams-overview.html)
-
-### 📐 Class Diagrams
-- [UML Class Diagram Tutorial](https://www.visual-paradigm.com/guide/uml-unified-modeling-language/uml-class-diagram-tutorial/)
-- [Draw.io](https://app.diagrams.net)
-
-### 🔁 Sequence Diagrams
-- [UML Sequence Diagram Guide](https://www.uml-diagrams.org/sequence-diagrams.html)
-- [Mermaid.js Docs](https://mermaid.js.org)
-
----
-
-## ✅ Expected Outcome
-
-By the end of this project, you will have:
-
-- A **clear architectural vision**
-- Detailed **class and sequence diagrams**
-- Full **technical documentation**
-- A blueprint ready for the next development phase
-
----
-
-## 👥 Authors
-
-- [Alexis Cornillon](https://github.com/Alexiscnl)
-- [Jules Moleins](https://github.com/Roullito)
-- [Benoit Maingon](https://github.com/BenoitMain)
-
----
-
-## 📝 License
-
-This project is part of the Holberton School curriculum. All rights reserved.
+Jules Moleins, Alexis Cornillon, Benoît Maingon
